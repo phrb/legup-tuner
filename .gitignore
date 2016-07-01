@@ -1,0 +1,6 @@
+*.swp
+*.pyc
+*.txt
+*.tcl
+opentuner.*
+__pycache__
