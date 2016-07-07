@@ -62,7 +62,7 @@ class LegUpParametersTuner(MeasurementInterface):
 
     def save_final_config(self, configuration):
         self.manipulator().save_to_file(configuration.data,
-                                        'legup_final_config.json')
+                                        'final_config.json')
 
 if __name__ == '__main__':
     argparser        = opentuner.default_argparser()
