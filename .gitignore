@@ -2,5 +2,6 @@
 *.pyc
 *.txt
 *.tcl
+legup_final_config.json
 opentuner.*
 __pycache__
