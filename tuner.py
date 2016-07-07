@@ -60,6 +60,10 @@ class LegUpParametersTuner(MeasurementInterface):
         cost = self.get_wallclock_time(filename)
         return opentuner.resultsdb.models.Result(time = cost)
 
+    def save_final_config(self, configuration):
+        self.manipulator().save_to_file(configuration.data,
+                                        'legup_final_config.json')
+
 if __name__ == '__main__':
     argparser        = opentuner.default_argparser()
     application_path = "legup_src/legup-4.0/examples/chstone/dfadd"
@@ -67,4 +71,5 @@ if __name__ == '__main__':
     host_path        = "/home/phrb/code/legup-tuner"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
+    #legup_parameters.generate_seed()
     LegUpParametersTuner.main(argparser.parse_args())
