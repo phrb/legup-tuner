@@ -4,8 +4,8 @@ from enum import Enum
 parameters = {
 #    "set_parameter CASE_FSM" : [bool, [], True],
     "set_parameter CLOCK_PERIOD" : [int, [10, 30], ["set_parameter SDC_NO_CHAINING"], 10],
-    "set_parameter GROUP_RAMS" : [bool, [], False],
-    "set_parameter GROUP_RAMS_SIMPLE_OFFSET" : [bool, [], False],
+#    "set_parameter GROUP_RAMS" : [bool, [], False],
+#    "set_parameter GROUP_RAMS_SIMPLE_OFFSET" : [bool, [], False],
 #    "set_parameter LOCAL_RAMS" : [bool, [], False],
     "set_parameter MB_MINIMIZE_HW" : [bool, [], False],
     "set_combine_basicblock" : [int, [0, 2], [], 0],
@@ -160,6 +160,10 @@ def parameter_values(name):
 def generate_file(configuration):
     filename = "config.tcl"
     text     = "source ../{0}\n".format(filename)
+    text    += "set_parameter LOCAL_RAMS 1\n"
+    text    += "set_parameter GROUP_RAMS 1\n"
+    text    += "set_parameter GROUP_RAMS_SIMPLE_OFFSET 1\n"
+    text    += "set_parameter CASE_FSM 1\n"
     file     = open("{0}".format(filename), "w+")
     for name in parameters:
         if parameter_type(name) == bool:

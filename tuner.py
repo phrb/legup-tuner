@@ -66,10 +66,11 @@ class LegUpParametersTuner(MeasurementInterface):
 
 if __name__ == '__main__':
     argparser        = opentuner.default_argparser()
-    application_path = "legup_src/legup-4.0/examples/chstone/dfadd"
-    container_path   = "/root/legup_src/legup-4.0/examples/chstone/dfadd/tuner"
+    application      = "sha"
+    application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
+    container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
     host_path        = "/home/phrb/code/legup-tuner"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
-    #legup_parameters.generate_seed()
+    legup_parameters.generate_seed()
     LegUpParametersTuner.main(argparser.parse_args())
