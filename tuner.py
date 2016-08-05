@@ -11,12 +11,29 @@ from opentuner.measurement import MeasurementInterface
 from opentuner import IntegerParameter
 from opentuner import Result
 
+from datetime import datetime
+
 import sys
+import json
 
 class LegUpParametersTuner(MeasurementInterface):
-    def get_wallclock_time(self, config_file):
-        penalty = 999999999
+    def log_intermediate(self, data, cost):
+        global last_best, start_date
 
+        now = datetime.now()
+
+        full_log.write("{0} {1}\n".format((now - start_date).total_seconds(), cost))
+        full_config_log.write("{0},\n".format(json.dumps(data)))
+
+        if cost < last_best:
+            last_best = cost
+            best_log.write("{0} {1}\n".format((now - start_date).total_seconds(), cost))
+            best_config_log.write("{0},\n".format(json.dumps(data)))
+        else:
+            best_log.write("{0} {1}\n".format((now - start_date).total_seconds(), last_best))
+            best_config_log.write("{0},\n".format(json.dumps(data)))
+
+    def get_wallclock_time(self, config_file):
         docker_cmd = "sudo docker run --rm"
         docker_cmd += " -w {0}".format(container_path)
 
@@ -58,19 +75,43 @@ class LegUpParametersTuner(MeasurementInterface):
     def run(self, desired_result, input, limit):
         filename = legup_parameters.generate_file(desired_result.configuration.data)
         cost = self.get_wallclock_time(filename)
+
+        if cost != penalty:
+            self.log_intermediate(desired_result.configuration.data, cost)
         return opentuner.resultsdb.models.Result(time = cost)
 
     def save_final_config(self, configuration):
         self.manipulator().save_to_file(configuration.data,
                                         'final_config.json')
+        full_config_log.write("]")
+        full_config_log.close()
+
+        best_config_log.write("]")
+        best_config_log.close()
+
+        full_log.close()
+        best_log.close()
 
 if __name__ == '__main__':
     argparser        = opentuner.default_argparser()
-    application      = "sha"
+    application      = "dfadd"
     application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
     host_path        = "/home/phrb/code/legup-tuner"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
-    legup_parameters.generate_seed()
+
+    penalty          = 999999999
+
+    last_best        = float('inf')
+    start_date       = datetime.now()
+
+    full_log         = open("full_log.txt", "w+")
+    full_config_log  = open("full_log.json", "w+")
+    full_config_log.write("[\n")
+
+    best_log         = open("best_log.txt", "w+")
+    best_config_log  = open("best_log.json", "w+")
+    best_config_log.write("[\n")
+    #legup_parameters.generate_seed()
     LegUpParametersTuner.main(argparser.parse_args())
