@@ -157,9 +157,9 @@ def parameter_type(name):
 def parameter_values(name):
     return [True, False] if parameters[name][0] == bool else parameters[name][1]
 
-def generate_file(configuration):
-    filename = "config.tcl"
-    text     = "source ../{0}\n".format(filename)
+def generate_file(configuration, path):
+    filename = "{0}/config.tcl".format(path)
+    text     = "source ../config.tcl\n"
     text    += "set_parameter LOCAL_RAMS 1\n"
     text    += "set_parameter GROUP_RAMS 1\n"
     text    += "set_parameter GROUP_RAMS_SIMPLE_OFFSET 1\n"

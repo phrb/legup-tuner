@@ -1,2 +1,2 @@
 #! /usr/bin/zsh
-sudo rm -rf opentuner.* config.tcl log.txt full_* best_*
+sudo rm -rf opentuner.* config.tcl log.txt best_*

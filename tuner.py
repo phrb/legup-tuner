@@ -1,99 +1,136 @@
+import adddeps  # add opentuner to path in dev mode
+
 from enum import Enum
 import legup_parameters
 import argparse
 
 import subprocess
+import time
+from multiprocessing.pool import ThreadPool
 
 import opentuner
+from opentuner.api import TuningRunManager
 from opentuner.search.manipulator import ConfigurationManipulator
+from opentuner.measurement.interface import DefaultMeasurementInterface
 from opentuner.search.manipulator import EnumParameter, BooleanParameter
 from opentuner.measurement import MeasurementInterface
 from opentuner import IntegerParameter
-from opentuner import Result
+from opentuner.resultsdb.models import Result
 
-from datetime import datetime
+import time
 
 import sys
+import os
+
+from shutil import copy, rmtree
+
 import json
 
-class LegUpParametersTuner(MeasurementInterface):
-    def log_intermediate(self, data, cost):
-        global last_best, start_date
+from uuid import uuid4
 
-        now = datetime.now()
+def log_intermediate(current_time, manager):
+    current_best = manager.get_best_result()
 
-        full_log.write("{0} {1}\n".format((now - start_date).total_seconds(), cost))
-        full_config_log.write("{0},\n".format(json.dumps(data)))
+    if current_best != None:
+        best_log.write("{0} {1}\n".format(current_time, current_best.time))
+        best_config_log.write("{0},\n".format(json.dumps(current_best.configuration.data)))
+        print current_time, current_best.time
 
-        if cost < last_best:
-            last_best = cost
-            best_log.write("{0} {1}\n".format((now - start_date).total_seconds(), cost))
-            best_config_log.write("{0},\n".format(json.dumps(data)))
+def save_final_configuration(configuration):
+    best_config_log.write("]")
+    best_config_log.close()
+
+    best_log.close()
+
+def get_wallclock_time(cfg):
+    unique_id        = uuid4()
+
+    unique_host_path = "{0}/{1}".format(host_path, unique_id)
+
+    os.mkdir(unique_host_path)
+
+    copy(script_name, "{0}/{1}".format(unique_host_path, script_name))
+
+    filename = legup_parameters.generate_file(cfg, unique_host_path)
+
+    docker_cmd  = "sudo docker run --rm"
+    docker_cmd += " -w {0}".format(container_path)
+
+    docker_cmd += " -v {0}:".format(unique_host_path)
+    docker_cmd += "{0} -t -i {1}".format(container_path, image_name)
+
+    docker_cmd += " /bin/bash -c \"./{0}\"".format(script_name)
+
+    output = subprocess.check_output(docker_cmd, shell = True)
+    output = output.split()
+
+    rmtree(unique_host_path, ignore_errors = True)
+
+    try:
+        cycles            = float(output[0])
+        cycles_per_second = float(output[1])
+        factor            = 1000.
+        return cycles * (factor / cycles_per_second)
+    except ValueError:
+        # TODO: Discover all parameters that
+        #       break compilation
+        return penalty
+
+def tuning_loop():
+    report_delay = 30
+    last_time    = time.time()
+    start_time   = last_time
+    iterations   = 5
+    parser       = argparse.ArgumentParser(parents=opentuner.argparsers())
+    args         = parser.parse_args()
+    pool         = ThreadPool(16)
+    manipulator  = ConfigurationManipulator()
+
+    for name in legup_parameters.parameters:
+        parameter_type = legup_parameters.parameter_type(name)
+        values = legup_parameters.parameter_values(name)
+        if parameter_type == int:
+            manipulator.add_parameter(IntegerParameter(name, values[0], values[1]))
+        elif parameter_type == bool:
+            manipulator.add_parameter(BooleanParameter(name))
+        elif parameter_type == Enum:
+            manipulator.add_parameter(EnumParameter(name, values))
         else:
-            best_log.write("{0} {1}\n".format((now - start_date).total_seconds(), last_best))
-            best_config_log.write("{0},\n".format(json.dumps(data)))
+            print("ERROR: No such parameter type \"{0}\"".format(name))
 
-    def get_wallclock_time(self, config_file):
-        docker_cmd = "sudo docker run --rm"
-        docker_cmd += " -w {0}".format(container_path)
+    interface = DefaultMeasurementInterface(args            = args,
+                                            manipulator     = manipulator,
+                                            project_name    = 'HLS-FPGAs',
+                                            program_name    = 'legup-tuner',
+                                            program_version = '0.0.1')
 
-        docker_cmd += " -v {0}:".format(host_path)
-        docker_cmd += "{0} -t -i {1}".format(container_path, image_name)
+    manager = TuningRunManager(interface, args)
 
-        docker_cmd += " /bin/bash -c \"./{0}\"".format(script_name)
+    for x in xrange(iterations):
+        desired_results = manager.get_desired_results()
+        desired_cfgs    = [result.configuration.data for result in desired_results]
 
-        output = subprocess.check_output(docker_cmd, shell = True)
-        output = output.split()
-        print(output)
+        if len(desired_results) == 0:
+            continue
 
-        try:
-            cycles = float(output[0])
-            cycles_per_second = float(output[1])
-            factor = 1000.
-            return cycles * (factor / cycles_per_second)
-        except ValueError:
-            # TODO: Discover all parameters that
-            #       break compilation
-            print("PENALTY!")
-            return penalty
+        results = pool.map(get_wallclock_time, desired_cfgs)
 
-    def manipulator(self):
-        manipulator = ConfigurationManipulator()
-        for name in legup_parameters.parameters:
-            parameter_type = legup_parameters.parameter_type(name)
-            values = legup_parameters.parameter_values(name)
-            if parameter_type == int:
-                manipulator.add_parameter(IntegerParameter(name, values[0], values[1]))
-            elif parameter_type == bool:
-                manipulator.add_parameter(BooleanParameter(name))
-            elif parameter_type == Enum:
-                manipulator.add_parameter(EnumParameter(name, values))
-            else:
-                print("ERROR: No such parameter type \"{0}\"".format(name))
-        return manipulator
+        for dr, result in zip(desired_results, results):
+            manager.report_result(dr, Result(time = result))
 
-    def run(self, desired_result, input, limit):
-        filename = legup_parameters.generate_file(desired_result.configuration.data)
-        cost = self.get_wallclock_time(filename)
+        current_time = time.time()
 
-        if cost != penalty:
-            self.log_intermediate(desired_result.configuration.data, cost)
-        return opentuner.resultsdb.models.Result(time = cost)
+        if (current_time - last_time) >= report_delay:
+            log_intermediate(current_time - start_time, manager)
+            last_time = current_time
 
-    def save_final_config(self, configuration):
-        self.manipulator().save_to_file(configuration.data,
-                                        'final_config.json')
-        full_config_log.write("]")
-        full_config_log.close()
+    current_time = time.time()
+    log_intermediate(current_time - start_time, manager)
 
-        best_config_log.write("]")
-        best_config_log.close()
-
-        full_log.close()
-        best_log.close()
+    save_final_configuration(manager.get_best_configuration())
+    manager.finish()
 
 if __name__ == '__main__':
-    argparser        = opentuner.default_argparser()
     application      = "dfadd"
     application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
@@ -101,17 +138,10 @@ if __name__ == '__main__':
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
 
-    penalty          = 999999999
-
-    last_best        = float('inf')
-    start_date       = datetime.now()
-
-    full_log         = open("full_log.txt", "w+")
-    full_config_log  = open("full_log.json", "w+")
-    full_config_log.write("[\n")
+    penalty          = float('inf')
 
     best_log         = open("best_log.txt", "w+")
     best_config_log  = open("best_log.json", "w+")
     best_config_log.write("[\n")
     #legup_parameters.generate_seed()
-    LegUpParametersTuner.main(argparser.parse_args())
+    tuning_loop()
