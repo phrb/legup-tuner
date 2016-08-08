@@ -113,10 +113,18 @@ def tuning_loop():
         if len(desired_results) == 0:
             continue
 
-        results = pool.map(get_wallclock_time, desired_cfgs)
+        results = []
 
+        for desired_cfg in desired_cfgs:
+            results.append(pool.apply_async(get_wallclock_time, desired_cfg))
+
+        ready_results = []
         for dr, result in zip(desired_results, results):
-            manager.report_result(dr, Result(time = result))
+            if result.ready() and dr not in ready_results:
+                cost = result.get()
+                manager.report_result(dr, Result(time = cost))
+                ready_results.append(dr)
+                print("reported result. time = {0}".format(cost))
 
         current_time = time.time()
 
