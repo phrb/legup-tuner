@@ -120,9 +120,6 @@ def tuning_loop():
     computed_results  = []
     desired_results   = manager.get_desired_results()
 
-    print(args.no_wait)
-    sys.exit(0)
-
     while current_time - start_time < args.stop_after:
         if args.no_wait:
             if len(desired_results) != 0 or len(computing_results) != 0:
