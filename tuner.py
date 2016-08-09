@@ -61,29 +61,38 @@ def get_wallclock_time(cfg):
 
     docker_cmd += " /bin/bash -c \"./{0}\"".format(script_name)
 
-    output = subprocess.check_output(docker_cmd, shell = True)
-    output = output.split()
-
-    rmtree(unique_host_path, ignore_errors = True)
-
     try:
+        output = subprocess.check_output(docker_cmd, shell = True)
+        output = output.split()
+
         cycles            = float(output[0])
         cycles_per_second = float(output[1])
         factor            = 1000.
+        rmtree(unique_host_path, ignore_errors = True)
         return cycles * (factor / cycles_per_second)
-    except ValueError:
+    except:
         # TODO: Discover all parameters that
         #       break compilation
+        rmtree(unique_host_path, ignore_errors = True)
         return penalty
+
 
 def tuning_loop():
     report_delay = 30
     last_time    = time.time()
     start_time   = last_time
     iterations   = 5
-    parser       = argparse.ArgumentParser(parents=opentuner.argparsers())
+    parser       = argparse.ArgumentParser(parents = opentuner.argparsers())
+
+    parser.add_argument("--processes",
+                        type = int,
+                        help = "Number of Python threads available.")
+    parser.add_argument("--no-wait",
+                        action = "store_true",
+                        help   = "Do not wait for requested results to generate more requests.")
+
     args         = parser.parse_args()
-    pool         = ThreadPool(16)
+    pool         = ThreadPool(args.processes)
     manipulator  = ConfigurationManipulator()
 
     for name in legup_parameters.parameters:
@@ -106,25 +115,42 @@ def tuning_loop():
 
     manager = TuningRunManager(interface, args)
 
-    for x in xrange(iterations):
+    current_time      = time.time()
+    computing_results = []
+    computed_results  = []
+    desired_results   = manager.get_desired_results()
+
+    print(args.no_wait)
+    sys.exit(0)
+
+    while current_time - start_time < args.stop_after:
+        if args.no_wait:
+            if len(desired_results) != 0 or len(computing_results) != 0:
+                for desired_result in desired_results:
+                    computing_results.append([desired_result,
+                                              pool.apply_async(get_wallclock_time,
+                                                              (desired_result.configuration.data, ))])
+
+                for result in computing_results:
+                    if result[1].ready() and result[0] not in computed_results:
+                        cost = result[1].get()
+                        manager.report_result(result[0], Result(time = cost))
+                        computed_results.append(result)
+
+                for result in computed_results:
+                    if result in computing_results:
+                        computing_results.remove(result)
+
+                computed_results = []
+        else:
+            if len(desired_results) != 0:
+                cfgs    = [dr.configuration.data for dr in desired_results]
+                results = pool.map(get_wallclock_time, cfgs)
+
+                for dr, result in zip(desired_results, results):
+                    manager.report_result(dr, Result(time = result))
+
         desired_results = manager.get_desired_results()
-        desired_cfgs    = [result.configuration.data for result in desired_results]
-
-        if len(desired_results) == 0:
-            continue
-
-        results = []
-
-        for desired_cfg in desired_cfgs:
-            results.append(pool.apply_async(get_wallclock_time, desired_cfg))
-
-        ready_results = []
-        for dr, result in zip(desired_results, results):
-            if result.ready() and dr not in ready_results:
-                cost = result.get()
-                manager.report_result(dr, Result(time = cost))
-                ready_results.append(dr)
-                print("reported result. time = {0}".format(cost))
 
         current_time = time.time()
 
