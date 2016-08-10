@@ -184,3 +184,52 @@ def generate_seed():
     file = open("seed.json", "w+")
     json.dump(seed, file)
     file.close()
+
+def get_dependencies(name, index):
+    deps = ""
+    for dep in parameters[name][index]:
+        deps += " {0}".format(dep)
+
+    return str.strip(deps)
+
+def get_values(name, index):
+    return get_dependencies(name, index)
+
+def export_to_json():
+    file = open("legup_parameters.json", "w+")
+    file.write("\"legup_parameters\":[\n")
+
+    last = parameters.keys()[-1]
+
+    for name in parameters:
+        file.write("    {{\n        \"name\":\"{0}\",\n".format(name))
+        name_type = parameters[name][0]
+        file.write("        \"type\":\"{0}\",\n".format(str(name_type).split("'")[1]))
+        if name_type == bool:
+            deps = get_dependencies(name, 1)
+            file.write("        \"dependencies\":\"{0}\",\n".format(deps))
+            file.write("        \"default\":\"{0}\"\n".format(parameters[name][2]))
+        elif name_type == Enum:
+            vals = get_values(name, 1)
+            file.write("        \"values\":\"{0}\",\n".format(vals))
+            deps = get_dependencies(name, 2)
+            file.write("        \"dependencies\":\"{0}\",\n".format(deps))
+            file.write("        \"default\":\"{0}\"\n".format(parameters[name][3]))
+        else:
+            file.write("        \"min\":\"{0}\",\n".format(parameters[name][1][0]))
+            file.write("        \"max\":\"{0}\",\n".format(parameters[name][1][1]))
+            deps = get_dependencies(name, 2)
+            file.write("        \"dependencies\":\"{0}\",\n".format(deps))
+            file.write("        \"default\":\"{0}\"\n".format(parameters[name][3]))
+
+        if name != last:
+            file.write("    },\n")
+        else:
+            file.write("    }\n")
+
+    file.write("]")
+
+    file.close()
+
+if __name__ == "__main__":
+    export_to_json()
