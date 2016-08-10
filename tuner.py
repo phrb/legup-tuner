@@ -76,7 +76,6 @@ def get_wallclock_time(cfg):
         rmtree(unique_host_path, ignore_errors = True)
         return penalty
 
-
 def tuning_loop():
     report_delay = 30
     last_time    = time.time()
@@ -142,7 +141,7 @@ def tuning_loop():
         else:
             if len(desired_results) != 0:
                 cfgs    = [dr.configuration.data for dr in desired_results]
-                results = pool.map(get_wallclock_time, cfgs)
+                results = pool.map_async(get_wallclock_time, cfgs).get(timeout = None)
 
                 for dr, result in zip(desired_results, results):
                     manager.report_result(dr, Result(time = result))
