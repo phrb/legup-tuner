@@ -197,7 +197,7 @@ def get_values(name, index):
 
 def export_to_json():
     file = open("legup_parameters.json", "w+")
-    file.write("\"legup_parameters\":[\n")
+    file.write("{\"legup_parameters\":[\n")
 
     last = parameters.keys()[-1]
 
@@ -227,7 +227,7 @@ def export_to_json():
         else:
             file.write("    }\n")
 
-    file.write("]")
+    file.write("]}")
 
     file.close()
 

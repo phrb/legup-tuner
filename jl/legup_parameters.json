@@ -1,4 +1,4 @@
-"legup_parameters":[
+{"legup_parameters":[
     {
         "name":"set_operation_latency altfp_add_32",
         "type":"int",
@@ -1086,4 +1086,4 @@
         "dependencies":"",
         "default":"1"
     }
-]
+]}
