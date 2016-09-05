@@ -1,13 +1,13 @@
-#! /usr/bin/zsh
+#! /bin/bash
 
-name="dfadd"
+name=$1
 duration=5400
 parallel=1
 workers=1
 seed="seed.json"
 async="seq"
 
-sudo python2 tuner.py --stop-after=$duration --results-log=log.txt --parallelism=$parallel --processes=$workers --seed-configuration="$seed" --no-dups --quiet
+sudo python2 tuner.py --stop-after=$duration --results-log=log.txt --parallelism=$parallel --processes=$workers --seed-configuration="$seed" --no-dups
 
 new_dir=$name\_$duration\_p$parallel\_w$workers\_$async
 

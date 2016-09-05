@@ -1,2 +1,2 @@
-#! /usr/bin/zsh
+#! /bin/bash
 sudo rm -rf opentuner.db

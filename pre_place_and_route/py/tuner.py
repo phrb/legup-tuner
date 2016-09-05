@@ -22,7 +22,7 @@ import time
 import sys
 import os
 
-from shutil import copy, rmtree
+from shutil import copytree, rmtree
 
 import json
 
@@ -45,42 +45,33 @@ def save_final_configuration(configuration):
 def get_wallclock_time(cfg):
     unique_id        = uuid4()
 
-    unique_host_path = "{0}/{1}".format(host_path, unique_id)
+    unique_path = "{0}_{1}".format(application, unique_id)
 
-    os.mkdir(unique_host_path)
+    copytree(application, unique_path)
 
-    copy(script_name, "{0}/{1}".format(unique_host_path, script_name))
+    filename = legup_parameters.generate_file(cfg, unique_path)
 
-    filename = legup_parameters.generate_file(cfg, unique_host_path)
-
-    docker_cmd  = "sudo docker run --rm"
-    docker_cmd += " -w {0}".format(container_path)
-
-    docker_cmd += " -v {0}:".format(unique_host_path)
-    docker_cmd += "{0} -t -i {1}".format(container_path, image_name)
-
-    docker_cmd += " /bin/bash -c \"./{0}\"".format(script_name)
+    cmd = "./{0} {1}".format(script_name, unique_path)
 
     try:
-        output = subprocess.check_output(docker_cmd, shell = True)
+        output = subprocess.check_output(cmd, shell = True)
         output = output.split()
 
-        cycles            = float(output[0])
-        cycles_per_second = float(output[1])
-        factor            = 1000.
-        rmtree(unique_host_path, ignore_errors = True)
-        return cycles * (factor / cycles_per_second)
+        fmax          = float(output[0])
+        combinatorial = float(output[1])
+        registers     = float(output[2])
+        dsp           = float(output[3])
+
+        rmtree(unique_path, ignore_errors = True)
+        return fmax + combinatorial + registers + dsp
     except:
-        # TODO: Discover all parameters that
-        #       break compilation
-        rmtree(unique_host_path, ignore_errors = True)
+        rmtree(unique_path, ignore_errors = True)
         return penalty
 
 def tuning_loop():
-    report_delay = 30
+    report_delay = 300
     last_time    = time.time()
     start_time   = last_time
-    iterations   = 5
     parser       = argparse.ArgumentParser(parents = opentuner.argparsers())
 
     parser.add_argument("--processes",
@@ -161,11 +152,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "dfadd"
-    application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
-    container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
-    host_path        = "/home/phrb/code/legup-tuner"
-    image_name       = "legup_ubuntu"
+    application      = "../dfadd"
     script_name      = "measure.sh"
 
     penalty          = float('inf')

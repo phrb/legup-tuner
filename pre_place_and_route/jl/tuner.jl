@@ -6,13 +6,13 @@ import JSON
     function generate_file(config::Configuration, path::AbstractString)
         filename = "$path/config.tcl"
 
-        text     = "source ../config.tcl\n"
-        text     = string(text, "set_parameter LOCAL_RAMS 1\n")
-        text     = string(text, "set_parameter GROUP_RAMS 1\n")
-        text     = string(text, "set_parameter GROUP_RAMS_SIMPLE_OFFSET 1\n")
-        text     = string(text, "set_parameter CASE_FSM 1\n")
+        text = "source ../config.tcl\n"
+        text = string(text, "set_parameter LOCAL_RAMS 1\n")
+        text = string(text, "set_parameter GROUP_RAMS 1\n")
+        text = string(text, "set_parameter GROUP_RAMS_SIMPLE_OFFSET 1\n")
+        text = string(text, "set_parameter CASE_FSM 1\n")
 
-        file     = open("$filename", "w+")
+        file = open("$filename", "w+")
 
         for parameter in values(config.parameters)
             value::AbstractString
@@ -35,42 +35,34 @@ import JSON
     end
 
     function get_wallclock_time(config::Configuration, parameters::Dict{Symbol, Any})
-        application      = "dfadd"
-        application_path = "legup_src/legup-4.0/examples/chstone/$application"
-        container_path   = "/root/legup_src/legup-4.0/examples/chstone/$application/tuner"
-        host_path        = "/home/phrb/code/legup-tuner/jl"
-        image_name       = "legup_ubuntu"
+        application      = "jpeg"
         script_name      = "measure.sh"
 
         penalty          = Inf
 
         unique_id        = Base.Random.uuid4()
 
-        unique_host_path = "$host_path/$unique_id"
+        unique_path      = string("../../$application", "_$unique_id")
 
-        mkdir(unique_host_path)
+        cp("../../$application", unique_path)
 
-        cp(script_name, "$unique_host_path/$script_name")
+        filename = generate_file(config, unique_path)
 
-        filename = generate_file(config, unique_host_path)
-
-        docker_cmd = `docker run --rm -w $container_path
-                      -v $unique_host_path:$container_path -i $image_name
-                      /bin/bash -c 'chmod +x '$script_name' && './$script_name''`
+        cmd = `./$script_name $unique_path`
 
         try begin
-            output = split(readall(docker_cmd))
+            output = split(readall(cmd))
 
-            cycles            = parse(Float64, output[1])
-            cycles_per_second = parse(Float64, output[2])
-            factor            = 1000.
+            fmax          = parse(Float64, output[1])
+            combinatorial = parse(Float64, output[2])
+            registers     = parse(Float64, output[3])
+            dsp           = parse(Float64, output[4])
 
-            rm(unique_host_path, recursive = true)
-
-            return cycles * (factor / cycles_per_second)
+            rm(unique_path, recursive = true)
+            return fmax + combinatorial + registers + dsp
         end
         catch
-            rm(unique_host_path, recursive = true)
+            rm(unique_path, recursive = true)
             return penalty
         end
     end
@@ -88,14 +80,14 @@ function load_parameters()
             push!(parameters, IntegerParameter(parse(Int, parameter["min"]),
                                                parse(Int, parameter["max"]),
                                                parse(Int, parameter["default"]),
-                                               parameter["name"]))
+                                               ASCIIString(parameter["name"])))
         elseif p_type == "bool"
             value = false
             if parameter["default"] == "True"
                 value = true
             end
             push!(parameters, BoolParameter(value,
-                                            parameter["name"]))
+                                            ASCIIString(parameter["name"])))
         elseif p_type == "Enum"
             values = []
             for val in split(parameter["values"])
@@ -104,7 +96,7 @@ function load_parameters()
             push!(parameters, EnumParameter(values,
                                             findfirst(split(parameter["values"]),
                                                       parameter["default"]),
-                                            parameter["name"]))
+                                            ASCIIString(parameter["name"])))
         else
             println("ERROR: No such type")
             exit()
@@ -127,7 +119,7 @@ tuning_run = Run(cost               = get_wallclock_time,
                  stopping_criterion  = elapsed_time_criterion,
                  duration            = 3600,
                  reporting_criterion = elapsed_time_reporting_criterion,
-                 report_after        = 30)
+                 report_after        = 300)
 
 search_task = @task optimize(tuning_run)
 
