@@ -36,9 +36,10 @@ import JSON
 
     function get_wallclock_time(config::Configuration, parameters::Dict{Symbol, Any})
         application      = "dfadd"
+        verilog_file     = "dfadd.v"
         application_path = "legup_src/legup-4.0/examples/chstone/$application"
         container_path   = "/root/legup_src/legup-4.0/examples/chstone/$application/tuner"
-        host_path        = "/home/phrb/code/legup-tuner/jl"
+        host_path        = "/home/phrb/code/legup-tuner/post_place_and_route/jl"
         image_name       = "legup_ubuntu"
         script_name      = "measure.sh"
 
@@ -56,7 +57,7 @@ import JSON
 
         docker_cmd = `docker run --rm -w $container_path
                       -v $unique_host_path:$container_path -i $image_name
-                      /bin/bash -c 'chmod +x '$script_name' && './$script_name''`
+                      /bin/bash -c 'chmod +x '$script_name' && './$script_name' '$unique_id' '$verilog_file''`
 
         try begin
             output = split(readall(docker_cmd))
@@ -127,7 +128,7 @@ tuning_run = Run(cost               = get_wallclock_time,
                  stopping_criterion  = elapsed_time_criterion,
                  duration            = 3600,
                  reporting_criterion = elapsed_time_reporting_criterion,
-                 report_after        = 30)
+                 report_after        = 250)
 
 search_task = @task optimize(tuning_run)
 
