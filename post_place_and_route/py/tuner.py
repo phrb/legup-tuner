@@ -59,7 +59,9 @@ def get_wallclock_time(cfg):
     docker_cmd += " -v {0}:".format(unique_host_path)
     docker_cmd += "{0} -t -i {1}".format(container_path, image_name)
 
-    docker_cmd += " /bin/bash -c \"./{0}\"".format(script_name)
+    docker_cmd += " /bin/bash -c \"./{0} {1} {2}\"".format(script_name,
+                                                           unique_id,
+                                                           verilog_file)
 
     try:
         output = subprocess.check_output(docker_cmd, shell = True)
@@ -68,7 +70,7 @@ def get_wallclock_time(cfg):
         cycles            = float(output[0])
         cycles_per_second = float(output[1])
         factor            = 1000.
-        rmtree(unique_host_path, ignore_errors = True)
+        #rmtree(unique_host_path, ignore_errors = True)
         return cycles * (factor / cycles_per_second)
     except:
         # TODO: Discover all parameters that
@@ -162,9 +164,10 @@ def tuning_loop():
 
 if __name__ == '__main__':
     application      = "dfadd"
+    verilog_file     = "dfadd.v"
     application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
-    host_path        = "/home/phrb/code/legup-tuner"
+    host_path        = "/home/phrb/code/legup-tuner/post_place_and_route/py"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
 

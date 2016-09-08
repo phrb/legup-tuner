@@ -42,9 +42,9 @@ import JSON
 
         unique_id        = Base.Random.uuid4()
 
-        unique_path      = string("../../$application", "_$unique_id")
+        unique_path      = string("../$application", "_$unique_id")
 
-        cp("../../$application", unique_path)
+        cp("../$application", unique_path)
 
         filename = generate_file(config, unique_path)
 
@@ -119,7 +119,7 @@ tuning_run = Run(cost               = get_wallclock_time,
                  stopping_criterion  = elapsed_time_criterion,
                  duration            = 3600,
                  reporting_criterion = elapsed_time_reporting_criterion,
-                 report_after        = 300)
+                 report_after        = 1)
 
 search_task = @task optimize(tuning_run)
 

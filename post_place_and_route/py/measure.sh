@@ -1,9 +1,23 @@
 #! /bin/bash
 
-cd ..
+cd .. > /dev/null
+
+diff config.tcl tuner/config.tcl > tuner/config_diff_$1.txt
+
+2>/dev/null 1>/dev/null make -j4
+mv $2 old.v
+
 rm config.tcl
 cp tuner/config.tcl .
+
 2>/dev/null 1>/dev/null make -j4
+mv $2 new.v
+
+diff old.v new.v > tuner/verilog_diff_$1.txt
+
+2>/dev/null 1>/dev/null make clean
+2>/dev/null 1>/dev/null make -j4
+
 CYCLES=$(2>/dev/null make -j4 v | grep Cycles: | awk 'BEGIN { FS = " " } ; { print $3 }')
 if [[ -z $CYCLES ]]; then
     echo 'ERROR OCURRED'
