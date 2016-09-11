@@ -2,6 +2,7 @@
 
 from scipy import stats
 
+import re
 import os
 import matplotlib as mpl
 
@@ -15,9 +16,17 @@ def config_matplotlib():
     plt.rc('font', family = 'serif')
 
     font = {'family' : 'serif',
-            'size'   : 18}
+            'size'   : 16}
 
     mpl.rc('font', **font)
+
+def autolabel(rects, ax):
+    # attach some text labels
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width() / 2., height + .01,
+                '%.2f' % height,
+                ha = 'center', va = 'bottom')
 
 def plot_sct(data_x,
              data_y,
@@ -78,17 +87,22 @@ def plot_bar(data,
              file_title,
              title):
 
-    indexes = np.arange(width, index_range)
+    indexes = np.arange(index_range)
     fig     = plt.figure(1, figsize=(9, 6))
     ax      = fig.add_subplot(111)
 
-    ax.bar(indexes, data, width, color = 'black')
+    rects   = ax.bar(indexes + width, data, width, color = 'black')
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
-    ax.set_xticks(indexes + (width / 2))
+    ax.set_xticks(indexes + (1.5 * width))
     ax.set_ylabel(ylabel)
-    ax.set_xticklabels(tick_labels, rotation = 30)
+    ax.set_xticklabels(tick_labels)
+
+    ax.set_ylim([0, max(data) + (.1 * max(data))])
+    ax.axhline(y=1., color='r')
+
+    autolabel(rects, ax)
 
     plt.tight_layout()
 
@@ -100,27 +114,83 @@ if __name__ == '__main__':
     config_matplotlib()
 
     applications     = ["sha_7200_2",
-                        "dfadd_7200_2"]
+                        "dfadd_7200_2",
+                        "dfmul_7200_1"]
     speedups         = []
-    default_filename = "default.txt"
     best_filename    = "best_log.txt"
 
     for application in applications:
-        best_file = open("{0}/{1}".format(application, best_filename), "r")
-        best      = float(best_file.readlines()[-1].split()[1])
+        data_file = open("{0}/{1}".format(application, best_filename), "r")
+        data      = data_file.readlines()
 
-        default_file = open("{0}/{1}".format(application, default_filename), "r")
-        default      = float(default_file.readline())
-        speedups.append((application.split("_")[0], 1 - (best / default)))
+        data_file.close()
+
+        best      = float(data[-1].split()[1])
+        default   = float(data[0].split()[1])
+
+        speedups.append((application.split("_")[0], default / best))
 
     print speedups
 
     plot_bar([s[1] for s in speedups],
-             "testx",
-             "testy",
+             "Applications",
+             "Speedup vs. LegUp's Default",
              len(speedups),
-             .5,
+             .45,
              [s[0] for s in speedups],
-             "testf",
-             "testt")
+             "wct_speedups_chstone_7200_hls",
+             "Wall-clock Time Speedup after Tuning for 2h (CHStone)")
 
+    path             = "huang_et_al"
+    applications     = ["wct_sha.txt",
+                        "wct_dfadd.txt",
+                        "wct_dfmul.txt",
+                        "wct_dfdiv.txt",
+                        "wct_adpcm.txt"]
+    speedups         = []
+
+    for application in applications:
+        data_file = open("{0}/{1}".format(path, application), "r")
+        speedup   = float(data_file.readline())
+
+        data_file.close()
+
+        speedups.append((application.replace(".", "_").split("_")[1], speedup))
+
+    print speedups
+
+    plot_bar([s[1] for s in speedups],
+             "Applications",
+             "Speedup vs. LLVM's -O3",
+             len(speedups),
+             .45,
+             [s[0] for s in speedups],
+             "wct_speedups_chstone_7200_llvm",
+             "Wall-clock Time Speedup after Tuning for 2h (CHStone)")
+
+    path             = "huang_et_al"
+    applications     = ["clk_sha.txt",
+                        "clk_dfadd.txt",
+                        "clk_dfmul.txt",
+                        "clk_dfdiv.txt",
+                        "clk_adpcm.txt"]
+    speedups         = []
+
+    for application in applications:
+        data_file = open("{0}/{1}".format(path, application), "r")
+        speedup   = float(data_file.readline())
+
+        data_file.close()
+
+        speedups.append((application.replace(".", "_").split("_")[1], speedup))
+
+    print speedups
+
+    plot_bar([s[1] for s in speedups],
+             "Applications",
+             "Speedup vs. LLVM's -O3",
+             len(speedups),
+             .45,
+             [s[0] for s in speedups],
+             "clk_speedups_chstone_7200_llvm",
+             "Clock Cycles Speedup after Tuning for 2h (CHStone)")

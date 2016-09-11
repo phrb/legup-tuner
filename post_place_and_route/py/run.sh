@@ -1,6 +1,6 @@
 #! /usr/bin/zsh
 
-name="sha"
+name="dfmul"
 verilog_name="dfadd.v"
 duration=7200
 parallel=1

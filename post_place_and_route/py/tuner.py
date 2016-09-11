@@ -63,9 +63,6 @@ def get_wallclock_time(cfg):
                                                            unique_id,
                                                            verilog_file)
 
-    print(docker_cmd)
-    sys.exit(0)
-
     try:
         output = subprocess.check_output(docker_cmd, shell = True)
         output = output.split()
@@ -172,7 +169,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "adpcm"
+    application      = "dfdiv"
     verilog_file     = "dfadd.v"
     application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
