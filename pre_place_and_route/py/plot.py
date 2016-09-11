@@ -113,10 +113,11 @@ def plot_bar(data,
 if __name__ == '__main__':
     config_matplotlib()
 
-    applications     = ["sha_7200_2",
-                        "dfadd_7200_2",
-                        "dfmul_7200_1",
-                        "dfdiv_7200_1"]
+    applications     = ["sha_1800_1",
+                        "dfadd_1800_1",
+                        "dfmul_1800_1",
+                        "dfdiv_1800_1",
+                        "adpcm_1800_1"]
     speedups         = []
     best_filename    = "best_log.txt"
 
@@ -139,59 +140,5 @@ if __name__ == '__main__':
              len(speedups),
              .45,
              [s[0] for s in speedups],
-             "wct_speedups_chstone_7200_hls",
-             "Wall-clock Time Speedup after Tuning for 2h (Cyclone V DE1-SoC)")
-
-    path             = "huang_et_al"
-    applications     = ["wct_sha.txt",
-                        "wct_dfadd.txt",
-                        "wct_dfmul.txt",
-                        "wct_dfdiv.txt",
-                        "wct_adpcm.txt"]
-    speedups         = []
-
-    for application in applications:
-        data_file = open("{0}/{1}".format(path, application), "r")
-        speedup   = float(data_file.readline())
-
-        data_file.close()
-
-        speedups.append((application.replace(".", "_").split("_")[1], speedup))
-
-    print speedups
-
-    plot_bar([s[1] for s in speedups],
-             "CHStone Applications",
-             "Speedup vs. LLVM's -O3",
-             len(speedups),
-             .45,
-             [s[0] for s in speedups],
-             "wct_speedups_chstone_IN3_llvm",
-             "Wall-clock Time Speedup after IN3 (Cyclone II)")
-
-    path             = "huang_et_al"
-    applications     = ["clk_sha.txt",
-                        "clk_dfadd.txt",
-                        "clk_dfmul.txt",
-                        "clk_dfdiv.txt",
-                        "clk_adpcm.txt"]
-    speedups         = []
-
-    for application in applications:
-        data_file = open("{0}/{1}".format(path, application), "r")
-        speedup   = float(data_file.readline())
-
-        data_file.close()
-
-        speedups.append((application.replace(".", "_").split("_")[1], speedup))
-
-    print speedups
-
-    plot_bar([s[1] for s in speedups],
-             "CHStone Applications",
-             "Speedup vs. LLVM's -O3",
-             len(speedups),
-             .45,
-             [s[0] for s in speedups],
-             "clk_speedups_chstone_IN3_llvm",
-             "Clock Cycles Speedup after IN3 (Cyclone II)")
+             "clk_speedups_chstone_1800_hls",
+             "Clock Cycles Speedup after Tuning for 30min (Cyclone V DE1-SoC)")

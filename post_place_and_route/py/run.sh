@@ -1,6 +1,6 @@
 #! /usr/bin/zsh
 
-name="dfmul"
+name="dfdiv"
 verilog_name="dfadd.v"
 duration=7200
 parallel=1
