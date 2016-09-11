@@ -169,7 +169,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "dfdiv"
+    application      = "adpcm"
     verilog_file     = "dfadd.v"
     application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
