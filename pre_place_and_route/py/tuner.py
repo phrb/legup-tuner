@@ -42,12 +42,16 @@ def save_final_configuration(configuration):
 
     best_log.close()
 
+    legup_parameters.generate_file(configuration, "./")
+
 def get_wallclock_time(cfg):
     unique_id        = uuid4()
 
     unique_path = "{0}_{1}".format(application, unique_id)
 
     copytree(application, unique_path)
+
+    os.remove("{0}/config.tcl".format(unique_path))
 
     filename = legup_parameters.generate_file(cfg, unique_path)
 
@@ -57,19 +61,16 @@ def get_wallclock_time(cfg):
         output = subprocess.check_output(cmd, shell = True)
         output = output.split()
 
-        fmax          = float(output[0])
-        combinatorial = float(output[1])
-        registers     = float(output[2])
-        dsp           = float(output[3])
+        cycles = float(output[0])
 
         rmtree(unique_path, ignore_errors = True)
-        return fmax + combinatorial + registers + dsp
+        return cycles
     except:
         rmtree(unique_path, ignore_errors = True)
         return penalty
 
 def tuning_loop():
-    report_delay = 300
+    report_delay = 200
     last_time    = time.time()
     start_time   = last_time
     parser       = argparse.ArgumentParser(parents = opentuner.argparsers())
@@ -152,7 +153,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "../dfadd"
+    application      = "../dfdiv"
     script_name      = "measure.sh"
 
     penalty          = float('inf')

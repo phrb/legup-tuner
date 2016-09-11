@@ -3,7 +3,7 @@
         "name":"set_operation_latency altfp_add_32",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -11,7 +11,7 @@
         "name":"set_operation_latency altfp_divide_16",
         "type":"int",
         "min":"0",
-        "max":"34",
+        "max":"64",
         "dependencies":"",
         "default":"33"
     },
@@ -27,7 +27,7 @@
         "name":"set_operation_latency mem_dual_port",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -43,7 +43,7 @@
         "name":"set_operation_latency altfp_truncate_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"3"
     },
@@ -65,7 +65,7 @@
         "name":"set_operation_latency signed_modulus_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -109,7 +109,7 @@
         "name":"set_operation_latency altfp_subtract_8",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -125,7 +125,7 @@
         "name":"set_operation_latency signed_multiply_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -149,7 +149,7 @@
         "name":"set_operation_latency altfp_extend_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -157,7 +157,7 @@
         "name":"set_operation_latency unsigned_multiply_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -173,7 +173,7 @@
         "name":"set_operation_latency local_mem_dual_port",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -181,7 +181,7 @@
         "name":"set_operation_latency altfp_subtract_64",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -213,7 +213,7 @@
         "name":"set_operation_latency unsigned_divide_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -221,7 +221,7 @@
         "name":"set_operation_latency signed_multiply_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -229,7 +229,7 @@
         "name":"set_operation_latency signed_divide_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -237,7 +237,7 @@
         "name":"set_operation_latency signed_modulus_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -245,7 +245,7 @@
         "name":"set_operation_latency altfp_divide_8",
         "type":"int",
         "min":"0",
-        "max":"34",
+        "max":"64",
         "dependencies":"",
         "default":"33"
     },
@@ -253,7 +253,7 @@
         "name":"set_operation_latency signed_multiply_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -261,7 +261,7 @@
         "name":"set_operation_latency signed_multiply_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -275,7 +275,7 @@
         "name":"set_operation_latency altfp_add_64",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -283,7 +283,7 @@
         "name":"set_operation_latency altfp_fptosi",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"6"
     },
@@ -329,7 +329,7 @@
         "name":"set_operation_latency altfp_multiply_64",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"11"
     },
@@ -337,7 +337,7 @@
         "name":"set_operation_latency unsigned_add_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -345,7 +345,7 @@
         "name":"set_operation_latency unsigned_multiply_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -361,7 +361,7 @@
         "name":"set_operation_latency unsigned_add_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -369,7 +369,7 @@
         "name":"set_operation_latency altfp_truncate_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"3"
     },
@@ -393,7 +393,7 @@
         "name":"set_operation_latency signed_divide_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -421,7 +421,7 @@
         "name":"set_operation_latency signed_comp_o",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -459,7 +459,7 @@
         "name":"set_operation_latency signed_comp_u",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -481,7 +481,7 @@
         "name":"set_operation_latency unsigned_modulus_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -489,7 +489,7 @@
         "name":"set_operation_latency altfp_multiply_8",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"11"
     },
@@ -497,7 +497,7 @@
         "name":"set_operation_latency altfp_multiply_32",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"11"
     },
@@ -505,7 +505,7 @@
         "name":"set_operation_latency signed_add_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -513,7 +513,7 @@
         "name":"set_operation_latency altfp_add_16",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -521,7 +521,7 @@
         "name":"set_operation_latency altfp_truncate_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"3"
     },
@@ -545,7 +545,7 @@
         "name":"set_operation_latency altfp_subtract_16",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -561,7 +561,7 @@
         "name":"set_operation_latency altfp_extend_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -577,7 +577,7 @@
         "name":"set_operation_latency signed_add_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -585,7 +585,7 @@
         "name":"set_operation_latency reg",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -609,7 +609,7 @@
         "name":"set_operation_latency altfp_add_8",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -625,7 +625,7 @@
         "name":"set_operation_latency altfp_sitofp",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"6"
     },
@@ -657,7 +657,7 @@
         "name":"set_operation_latency signed_divide_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -672,7 +672,7 @@
         "name":"set_operation_latency unsigned_divide_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -708,7 +708,7 @@
         "name":"set_operation_latency unsigned_modulus_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -724,7 +724,7 @@
         "name":"set_operation_latency signed_modulus_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -746,7 +746,7 @@
         "name":"set_operation_latency altfp_multiply_16",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"11"
     },
@@ -754,7 +754,7 @@
         "name":"set_operation_latency unsigned_multiply_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -762,7 +762,7 @@
         "name":"set_operation_latency altfp_extend_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -770,7 +770,7 @@
         "name":"set_operation_latency unsigned_divide_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -778,7 +778,7 @@
         "name":"set_operation_latency altfp_divide_32",
         "type":"int",
         "min":"0",
-        "max":"34",
+        "max":"64",
         "dependencies":"",
         "default":"33"
     },
@@ -808,7 +808,7 @@
         "name":"set_operation_latency unsigned_add_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -854,7 +854,7 @@
         "name":"set_operation_latency altfp_subtract_32",
         "type":"int",
         "min":"0",
-        "max":"16",
+        "max":"64",
         "dependencies":"",
         "default":"14"
     },
@@ -868,7 +868,7 @@
         "name":"set_operation_latency unsigned_divide_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -906,7 +906,7 @@
         "name":"set_operation_latency signed_divide_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -914,7 +914,7 @@
         "name":"set_operation_latency altfp_truncate_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"3"
     },
@@ -938,7 +938,7 @@
         "name":"set_operation_latency signed_modulus_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -946,7 +946,7 @@
         "name":"set_operation_latency unsigned_modulus_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -954,7 +954,7 @@
         "name":"set_operation_latency unsigned_multiply_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -962,7 +962,7 @@
         "name":"set_operation_latency unsigned_modulus_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -986,7 +986,7 @@
         "name":"set_operation_latency signed_add_32",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -994,7 +994,7 @@
         "name":"set_operation_latency unsigned_add_8",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },
@@ -1002,7 +1002,7 @@
         "name":"set_operation_latency altfp_extend_16",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"2"
     },
@@ -1016,7 +1016,7 @@
         "name":"set_operation_latency signed_add_64",
         "type":"int",
         "min":"0",
-        "max":"8",
+        "max":"64",
         "dependencies":"",
         "default":"1"
     },

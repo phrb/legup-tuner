@@ -123,10 +123,9 @@ tuning_run = Run(cost               = get_wallclock_time,
                  starting_point     = configuration,
                  methods            = [[:simulated_annealing 1];
                                        [:iterative_first_improvement 1];
-                                       [:randomized_first_improvement 1];
-                                       [:iterative_greedy_construction 1];],
+                                       [:randomized_first_improvement 1];],
                  stopping_criterion  = elapsed_time_criterion,
-                 duration            = 3600,
+                 duration            = 5400,
                  reporting_criterion = elapsed_time_reporting_criterion,
                  report_after        = 250)
 
