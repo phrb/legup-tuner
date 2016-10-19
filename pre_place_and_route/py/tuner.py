@@ -153,7 +153,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "../dfdiv"
+    application      = "../motion"
     script_name      = "measure.sh"
 
     penalty          = float('inf')

@@ -85,10 +85,11 @@ def plot_bar(data,
              width,
              tick_labels,
              file_title,
-             title):
+             title,
+             ymax):
 
     indexes = np.arange(index_range)
-    fig     = plt.figure(1, figsize=(9, 6))
+    fig     = plt.figure(1, figsize=(10, 8))
     ax      = fig.add_subplot(111)
 
     rects   = ax.bar(indexes + width, data, width, color = 'black')
@@ -99,7 +100,7 @@ def plot_bar(data,
     ax.set_ylabel(ylabel)
     ax.set_xticklabels(tick_labels)
 
-    ax.set_ylim([0, max(data) + (.1 * max(data))])
+    ax.set_ylim([0, ymax + (.1 * ymax)])
     ax.axhline(y=1., color='r')
 
     autolabel(rects, ax)
@@ -116,7 +117,8 @@ if __name__ == '__main__':
     applications     = ["sha_7200_2",
                         "dfadd_7200_2",
                         "dfmul_7200_1",
-                        "dfdiv_7200_1"]
+                        "dfdiv_7200_1",
+                        "motion_7200_1"]
     speedups         = []
     best_filename    = "best_log.txt"
 
@@ -132,6 +134,7 @@ if __name__ == '__main__':
         speedups.append((application.split("_")[0], default / best))
 
     print speedups
+    ymax = max([s[1] for s in speedups])
 
     plot_bar([s[1] for s in speedups],
              "CHStone Applications",
@@ -140,14 +143,15 @@ if __name__ == '__main__':
              .45,
              [s[0] for s in speedups],
              "wct_speedups_chstone_7200_hls",
-             "Wall-clock Time Speedup after Tuning for 2h (Cyclone V DE1-SoC)")
+             "Wall-clock Time Speedup after Tuning for 2h (Cyclone V DE1-SoC)",
+             ymax)
 
     path             = "huang_et_al"
     applications     = ["wct_sha.txt",
                         "wct_dfadd.txt",
                         "wct_dfmul.txt",
                         "wct_dfdiv.txt",
-                        "wct_adpcm.txt"]
+                        "wct_motion.txt"]
     speedups         = []
 
     for application in applications:
@@ -159,6 +163,10 @@ if __name__ == '__main__':
         speedups.append((application.replace(".", "_").split("_")[1], speedup))
 
     print speedups
+
+    new_max = max([s[1] for s in speedups])
+    if new_max > ymax:
+        ymax = new_max
 
     plot_bar([s[1] for s in speedups],
              "CHStone Applications",
@@ -167,14 +175,48 @@ if __name__ == '__main__':
              .45,
              [s[0] for s in speedups],
              "wct_speedups_chstone_IN3_llvm",
-             "Wall-clock Time Speedup after IN3 (Cyclone II)")
+             "Wall-clock Time Speedup after IN3 (Cyclone II)",
+             ymax)
+
+    applications     = ["sha_1800_1",
+                        "dfadd_1800_1",
+                        "dfmul_1800_1",
+                        "dfdiv_1800_1",
+                        "motion_1800_1",
+                        "adpcm_1800_1"]
+    speedups         = []
+    best_filename    = "best_log.txt"
+
+    for application in applications:
+        data_file = open("{0}/{1}".format(application, best_filename), "r")
+        data      = data_file.readlines()
+
+        data_file.close()
+
+        best      = float(data[-1].split()[1])
+        default   = float(data[0].split()[1])
+
+        speedups.append((application.split("_")[0], default / best))
+
+    print speedups
+    ymax = max([s[1] for s in speedups])
+
+    plot_bar([s[1] for s in speedups],
+             "CHStone Applications",
+             "Speedup vs. LegUp's Default",
+             len(speedups),
+             .45,
+             [s[0] for s in speedups],
+             "clk_speedups_chstone_1800_hls",
+             "Clock Cycles Speedup after Tuning for 30min (Cyclone V DE1-SoC)",
+             ymax)
 
     path             = "huang_et_al"
     applications     = ["clk_sha.txt",
                         "clk_dfadd.txt",
                         "clk_dfmul.txt",
                         "clk_dfdiv.txt",
-                        "clk_adpcm.txt"]
+                        "clk_motion.txt"]
     speedups         = []
 
     for application in applications:
@@ -186,6 +228,9 @@ if __name__ == '__main__':
         speedups.append((application.replace(".", "_").split("_")[1], speedup))
 
     print speedups
+    new_max = max([s[1] for s in speedups])
+    if new_max > ymax:
+        ymax = new_max
 
     plot_bar([s[1] for s in speedups],
              "CHStone Applications",
@@ -194,4 +239,5 @@ if __name__ == '__main__':
              .45,
              [s[0] for s in speedups],
              "clk_speedups_chstone_IN3_llvm",
-             "Clock Cycles Speedup after IN3 (Cyclone II)")
+             "Clock Cycles Speedup after IN3 (Cyclone II)",
+             ymax)
