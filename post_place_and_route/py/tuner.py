@@ -6,7 +6,6 @@ import argparse
 
 import subprocess
 import time
-from multiprocessing import TimeoutError
 from multiprocessing.pool import ThreadPool
 
 import opentuner
@@ -54,19 +53,19 @@ def get_wallclock_time(cfg):
 
     filename = legup_parameters.generate_file(cfg, unique_host_path)
 
-    docker_cmd  = "sudo docker run --rm"
-    docker_cmd += " -w {0}".format(container_path)
+    os.system("cp -r {0} {1}".format(application_path, unique_host_path))
 
-    docker_cmd += " -v {0}:".format(unique_host_path)
-    docker_cmd += "{0} -t -i {1}".format(container_path, image_name)
+    os.chdir(unique_host_path)
 
-    docker_cmd += " /bin/bash -c \"./{0} {1} {2}\"".format(script_name,
-                                                           unique_id,
-                                                           verilog_file)
+    cmd = "./{0} {1} {2}".format(script_name,
+                                 unique_id,
+                                 verilog_file)
 
     try:
-        output = subprocess.check_output(docker_cmd, shell = True)
+        output = subprocess.check_output(cmd, shell = True)
         output = output.split()
+
+        os.chdir(host_path)
 
         cycles            = float(output[0])
         cycles_per_second = float(output[1])
@@ -76,6 +75,8 @@ def get_wallclock_time(cfg):
     except:
         # TODO: Discover all parameters that
         #       break compilation
+        os.chdir(host_path)
+
         rmtree(unique_host_path, ignore_errors = True)
         return penalty
 
@@ -150,7 +151,7 @@ def tuning_loop():
         else:
             if len(desired_results) != 0:
                 cfgs    = [dr.configuration.data for dr in desired_results]
-                results = pool.map_async(get_wallclock_time, cfgs).get(timeout = quartus_max_wait * len(cfgs))
+                results = pool.map_async(get_wallclock_time, cfgs).get(timeout = None)
 
                 for dr, result in zip(desired_results, results):
                     manager.report_result(dr, Result(time = result))
@@ -177,8 +178,6 @@ if __name__ == '__main__':
     host_path        = "/home/phrb/code/legup-tuner/post_place_and_route/py"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
-
-    quartus_max_wait = 900
 
     penalty          = float('inf')
 
