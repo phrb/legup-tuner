@@ -6,6 +6,7 @@ import argparse
 
 import subprocess
 import time
+from multiprocessing import TimeoutError
 from multiprocessing.pool import ThreadPool
 
 import opentuner
@@ -149,7 +150,7 @@ def tuning_loop():
         else:
             if len(desired_results) != 0:
                 cfgs    = [dr.configuration.data for dr in desired_results]
-                results = pool.map_async(get_wallclock_time, cfgs).get(timeout = None)
+                results = pool.map_async(get_wallclock_time, cfgs).get(timeout = quartus_max_wait * len(cfgs))
 
                 for dr, result in zip(desired_results, results):
                     manager.report_result(dr, Result(time = result))
@@ -176,6 +177,8 @@ if __name__ == '__main__':
     host_path        = "/home/phrb/code/legup-tuner/post_place_and_route/py"
     image_name       = "legup_ubuntu"
     script_name      = "measure.sh"
+
+    quartus_max_wait = 900
 
     penalty          = float('inf')
 
