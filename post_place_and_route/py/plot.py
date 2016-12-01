@@ -114,11 +114,17 @@ def plot_bar(data,
 if __name__ == '__main__':
     config_matplotlib()
 
-    applications     = ["sha_7200_2",
-                        "dfadd_7200_2",
-                        "dfmul_7200_1",
-                        "dfdiv_7200_1",
-                        "motion_7200_1"]
+    applications     = ["sha_5400_2",
+                        "dfadd_5400_2",
+                        "dfmul_5400_1",
+                        "dfdiv_5400_1",
+                        "motion_5400_1",
+			"adpcm_5400_1",
+			"aes_5400_1",
+			"blowfish_5400_1",
+			"dfsin_5400_1",
+			"gsm_5400_1",
+			"mips_5400_1"]
     speedups         = []
     best_filename    = "best_log.txt"
 
@@ -142,8 +148,8 @@ if __name__ == '__main__':
              len(speedups),
              .45,
              [s[0] for s in speedups],
-             "wct_speedups_chstone_7200_hls",
-             "Wall-clock Time Speedup after Tuning for 2h (Cyclone V DE1-SoC)",
+             "wct_speedups_chstone_5400_hls",
+             "Wall-clock Time Speedup after Tuning for 1.5h (Cyclone V DE1-SoC)",
              ymax)
 
     path             = "huang_et_al"
