@@ -102,6 +102,22 @@ def tuning_loop():
     pool         = ThreadPool(args.processes)
     manipulator  = ConfigurationManipulator()
 
+    global application
+    global verilog_file
+    global application_path
+    global container_path
+    global host_path
+    global image_name
+    global script_name
+
+    application      = args.application 
+    verilog_file     = args.verilog_file
+    application_path = "/root/legup_src/legup-4.0/examples/chstone/{0}".format(application)
+    container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
+    host_path        = "/home/bruelp/legup-tuner/post_place_and_route/py"
+    image_name       = "legup_quartus"
+    script_name      = "measure.sh"
+
     for name in legup_parameters.parameters:
         parameter_type = legup_parameters.parameter_type(name)
         values = legup_parameters.parameter_values(name)
@@ -169,13 +185,13 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "motion"
-    verilog_file     = "dfadd.v"
-    application_path = "legup_src/legup-4.0/examples/chstone/{0}".format(application)
-    container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
-    host_path        = "/home/phrb/code/legup-tuner/post_place_and_route/py"
-    image_name       = "legup_ubuntu"
-    script_name      = "measure.sh"
+    application      = "" 
+    verilog_file     = ""
+    application_path = ""
+    container_path   = ""
+    host_path        = ""
+    image_name       = ""
+    script_name      = ""
 
     penalty          = float('inf')
 
