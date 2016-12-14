@@ -1,10 +1,10 @@
 #! /usr/bin/python
 
-from scipy import stats
-
 import re
 import os
 import matplotlib as mpl
+
+import math
 
 mpl.use('agg')
 
@@ -128,9 +128,9 @@ if __name__ == '__main__':
                         "blowfish_5400_1"]
 
     metrics          = [
-                            { 'name': 'Wall-clock Time',
+                            { 'name': 'Sum of All Metrics',
                               'source_file': 'best_log.txt',
-                              'dest_file': 'wct'},
+                              'dest_file': 'sam'},
                             { 'name': 'Logic Utilization',
                               'source_file': 'best_lu_log.txt',
                               'dest_file': 'lu'},
@@ -150,7 +150,7 @@ if __name__ == '__main__':
                               'source_file': 'best_cycles_log.txt',
                               'dest_file': 'cycles'},
                             { 'name': 'DSP Blocks',
-                              'source_file': 'best_dsp_log.txt',
+                              'source_file': 'best_dps_log.txt',
                               'dest_file': 'dsp'},
                             { 'name': 'FMax',
                               'source_file': 'best_fmax_log.txt',
@@ -158,12 +158,14 @@ if __name__ == '__main__':
                        ]
 
     for metric in metrics:
-        speedups         = []
-        best_filename    = metric['source_file']
-        dest_filename    = metric['dest_file'] + "_5400_chstone_CycloneV"
-        name             = metric['name'] + " during 1.5h of Tuning (Cyclone V)"
+        best_filename = metric['source_file']
+
+        print metric['name']
 
         for application in applications:
+            print application
+            name          = metric['name'] + " during 1.5h of Tuning (Cyclone V, {0})".format(application.split("_")[0])
+            dest_filename = application.split("_")[0] + "_" + metric['dest_file'] + "_5400_chstone_CycloneV"
             data_file = open("{0}/{1}".format(application, best_filename), "r")
             data      = data_file.readlines()
 
@@ -176,33 +178,40 @@ if __name__ == '__main__':
                 data_x.append(line.split()[0])
                 data_y.append(line.split()[1])
 
-            plot_sct([data_x,
-                      data_y,
-                      dest_filename,
-                      name,
-                      "Time (s)",
-                      metric['name'])
+            plot_sct(data_x,
+                     data_y,
+                     dest_filename,
+                     name,
+                     "Time (s)",
+                     metric['name'])
 
-#        for application in applications:
-#            data_file = open("{0}/{1}".format(application, best_filename), "r")
-#            data      = data_file.readlines()
-#
-#            data_file.close()
-#
-#            best      = float(data[-1].split()[1])
-#            default   = float(data[0].split()[1])
-#
-#            speedups.append((application.split("_")[0], default / best))
-#
-#        print speedups
-#        ymax = max([s[1] for s in speedups])
-#
-#        plot_bar([s[1] for s in speedups],
-#                 "CHStone Applications",
-#                 "Speedup vs. LegUp's Default",
-#                 len(speedups),
-#                 .45,
-#                 [s[0] for s in speedups],
-#                 "wct_speedups_chstone_5400_hls",
-#                 "Wall-clock Time Speedup after Tuning for 1.5h (Cyclone V DE1-SoC)",
-#                 ymax)
+        if metric['name'] == 'Sum of All Metrics':
+            dest_filename = metric['dest_file'] + "_5400_chstone_CycloneV"
+            name          = metric['name'] + " after 1.5h of Tuning (Cyclone V)"
+            speedups = []
+
+            for application in applications:
+                data_file = open("{0}/{1}".format(application, best_filename), "r")
+                data      = data_file.readlines()
+
+                data_file.close()
+
+                best      = float(data[-1].split()[1])
+                default   = float(data[0].split()[1])
+
+                if math.isnan(default / best) or default / best == float('inf'):
+                    speedups.append((application.split("_")[0], 0))
+                else:
+                    speedups.append((application.split("_")[0], default / best))
+
+            ymax = max([s[1] for s in speedups])
+
+            plot_bar([s[1] for s in speedups],
+                     "CHStone Applications",
+                     "Improvement vs. LegUp's Default",
+                     len(speedups),
+                     .45,
+                     [s[0] for s in speedups],
+                     dest_filename,
+                     name,
+                     ymax)
