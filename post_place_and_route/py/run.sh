@@ -24,7 +24,7 @@ for name in $names; do
             --verilog-file=$verilog_name \
             --application=$name
 
-        mv log.txt log_details.txt opentuner.log best_log.txt best_log.json $new_dir
+        mv log.txt log_details.txt opentuner.log best_log.txt best_cycles_log.txt best_fmax_log.txt best_lu_log.txt best_pins_log.txt best_regs_log.txt best_block_log.txt best_ram_log.txt best_dps_log.txt best_log.json $new_dir
         ./clean.sh
     ; done
 ; done

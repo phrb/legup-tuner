@@ -33,6 +33,18 @@ def log_intermediate(current_time, manager):
 
     if current_best != None:
         best_log.write("{0} {1}\n".format(current_time, current_best.time))
+        best_cycles_log.write("{0} {1}\n".format(current_time, current_best.cycles))
+        best_fmax_log.write("{0} {1}\n".format(current_time, current_best.fmax))
+
+        best_lu_log.write("{0} {1}\n".format(current_time, current_best.LU))
+        best_pins_log.write("{0} {1}\n".format(current_time, current_best.pins))
+
+        best_regs_log.write("{0} {1}\n".format(current_time, current_best.regs))
+        best_block_log.write("{0} {1}\n".format(current_time, current_best.block))
+
+        best_ram_log.write("{0} {1}\n".format(current_time, current_best.ram))
+        best_dsp_log.write("{0} {1}\n".format(current_time, current_best.dsp))
+
         best_config_log.write("{0},\n".format(json.dumps(current_best.configuration.data)))
         print current_time, current_best.time
 
@@ -41,6 +53,8 @@ def save_final_configuration(configuration):
     best_config_log.close()
 
     best_log.close()
+    best_cycles_log.close()
+    best_fmax_log.close()
 
 def get_wallclock_time(cfg):
     unique_id        = uuid4()
@@ -67,16 +81,53 @@ def get_wallclock_time(cfg):
         output = subprocess.check_output(docker_cmd, shell = True)
         output = output.split()
 
-        cycles            = float(output[0])
-        cycles_per_second = float(output[1])
-        factor            = 1000.
+        print output
+
+        factor = 1000.
+        cycles = float(output[0])
+        fmax   = float(output[1])
+
+        # Skip output[2,3,4]
+
+        lu     = float(output[5])
+        pins   = float(output[6])
+        regs   = float(output[7])
+        block  = float(output[8])
+        ram    = float(output[9])
+        dsp    = float(output[10])
+
+        # TODO Improve weights
+        value = (cycles * (factor / fmax)) + lu + pins + regs + block + ram + dsp
+
+        result = { 'cycles': cycles,
+                   'fmax': fmax,
+                   'lu': lu,
+                   'pins': pins,
+                   'regs': regs,
+                   'block': block,
+                   'ram': ram,
+                   'dsp': dsp,
+                   'value': value,
+                 }
+
         rmtree(unique_host_path, ignore_errors = True)
-        return cycles * (factor / cycles_per_second)
+        return result
     except:
         # TODO: Discover all parameters that
         #       break compilation
+        result = { 'cycles': penalty,
+                   'fmax': penalty,
+                   'lu': penalty,
+                   'pins': penalty,
+                   'regs': penalty,
+                   'block': penalty,
+                   'ram': penalty,
+                   'dsp': penalty,
+                   'value': penalty,
+                 }
+
         rmtree(unique_host_path, ignore_errors = True)
-        return penalty
+        return result
 
 def tuning_loop():
     report_delay = 30
@@ -110,7 +161,7 @@ def tuning_loop():
     global image_name
     global script_name
 
-    application      = args.application 
+    application      = args.application
     verilog_file     = args.verilog_file
     application_path = "/root/legup_src/legup-4.0/examples/chstone/{0}".format(application)
     container_path   = "/root/legup_src/legup-4.0/examples/chstone/{0}/tuner".format(application)
@@ -168,7 +219,16 @@ def tuning_loop():
                 results = pool.map_async(get_wallclock_time, cfgs).get(timeout = None)
 
                 for dr, result in zip(desired_results, results):
-                    manager.report_result(dr, Result(time = result))
+                    manager.report_result(dr,
+                                          Result(time = result['value'],
+                                                 cycles = result['cycles'],
+                                                 fmax = result['fmax'],
+                                                 LU = result['lu'],
+                                                 pins = result['pins'],
+                                                 regs = result['regs'],
+                                                 block = result['block'],
+                                                 ram = result['ram'],
+                                                 dsp = result['dsp']))
 
         desired_results = manager.get_desired_results()
 
@@ -185,7 +245,7 @@ def tuning_loop():
     manager.finish()
 
 if __name__ == '__main__':
-    application      = "" 
+    application      = ""
     verilog_file     = ""
     application_path = ""
     container_path   = ""
@@ -196,6 +256,18 @@ if __name__ == '__main__':
     penalty          = float('inf')
 
     best_log         = open("best_log.txt", "w+")
+    best_cycles_log  = open("best_cycles_log.txt", "w+")
+    best_fmax_log    = open("best_fmax_log.txt", "w+")
+
+    best_lu_log      = open("best_lu_log.txt", "w+")
+    best_pins_log    = open("best_pins_log.txt", "w+")
+
+    best_regs_log    = open("best_regs_log.txt", "w+")
+    best_block_log   = open("best_block_log.txt", "w+")
+
+    best_ram_log     = open("best_ram_log.txt", "w+")
+    best_dsp_log     = open("best_dps_log.txt", "w+")
+
     best_config_log  = open("best_log.json", "w+")
     best_config_log.write("[\n")
     #legup_parameters.generate_seed()
