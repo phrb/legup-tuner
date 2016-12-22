@@ -163,8 +163,8 @@ if __name__ == '__main__':
     for application in applications:
         print application
 
-        name          = "{0} Metrics during 1.5h of Tuning (Cyclone V)".format(application.split("_")[0])
-        dest_filename = application.split("_")[0] + "_all_5400_chstone_CycloneV"
+        name          = "{0} Metrics during 1.5h of Tuning (Stratix V)".format(application.split("_")[0])
+        dest_filename = application.split("_")[0] + "_all_5400_chstone_StratixV"
 
         data_x = []
         data_y = []
@@ -216,8 +216,8 @@ if __name__ == '__main__':
 
         for application in applications:
             print application
-            name          = metric['name'] + " during 1.5h of Tuning (Cyclone V, {0})".format(application.split("_")[0])
-            dest_filename = application.split("_")[0] + "_" + metric['dest_file'] + "_5400_chstone_CycloneV"
+            name          = metric['name'] + " during 1.5h of Tuning (Stratix V, {0})".format(application.split("_")[0])
+            dest_filename = application.split("_")[0] + "_" + metric['dest_file'] + "_5400_chstone_StratixV"
             data_file = open("{0}/{1}".format(application, best_filename), "r")
             data      = data_file.readlines()
 
@@ -238,8 +238,8 @@ if __name__ == '__main__':
                      metric['name'])
 
         if metric['name'] == 'Sum of All Metrics':
-            dest_filename = metric['dest_file'] + "_5400_chstone_CycloneV"
-            name          = metric['name'] + " after 1.5h of Tuning (Cyclone V)"
+            dest_filename = metric['dest_file'] + "_5400_chstone_StratixV"
+            name          = metric['name'] + " after 1.5h of Tuning (Stratix V)"
             speedups = []
 
             for application in applications:
