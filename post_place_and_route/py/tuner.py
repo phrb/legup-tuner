@@ -59,6 +59,37 @@ def save_final_configuration(configuration):
     best_cycles_log.close()
     best_fmax_log.close()
 
+def relative_improvement_normalization(cycles, fmax, lu, pins,
+                                       regs, block, ram, dsp):
+    global tuning_init
+    global seed_values
+
+    factor = 1000.
+
+    if tuning_init:
+        tuning_init = False
+
+        seed_values = { 'cycles': cycles,
+                        'fmax': fmax,
+                        'wct': (cycles * (factor / fmax))
+                        'lu': lu,
+                        'pins': pins,
+                        'regs': regs,
+                        'block': block,
+                        'ram': ram,
+                        'dsp': dsp,
+                      }
+
+    value = ((cycles * (factor / fmax) / seed_values['wct']) + \
+            (lu / seed_value['lu']) +                          \
+            (pins / seed_value['pins']) +                      \
+            (regs / seed_value['regs']) +                      \
+            (block / seed_value['block']) +                    \
+            (ram / seed_value['ram']) +                        \
+            (dsp / seed_value['dsp'])) / 7
+
+    return value
+
 def get_wallclock_time(cfg):
     unique_id        = uuid4()
 
@@ -100,7 +131,16 @@ def get_wallclock_time(cfg):
         dsp    = float(output[10])
 
         # TODO Improve weights
-        value = (cycles * (factor / fmax)) + lu + pins + regs + block + ram + dsp
+        # value = (cycles * (factor / fmax)) + lu + pins + regs + block + ram + dsp
+
+        value = relative_improvement_normalization(cycles,
+                                                   fmax,
+                                                   lu,
+                                                   pins,
+                                                   regs,
+                                                   block,
+                                                   ram,
+                                                   dsp)
 
         result = { 'cycles': cycles,
                    'fmax': fmax,
@@ -163,6 +203,8 @@ def tuning_loop():
     global host_path
     global image_name
     global script_name
+
+    global tuning_init
 
     application      = args.application
     verilog_file     = args.verilog_file
@@ -273,6 +315,19 @@ if __name__ == '__main__':
 
     best_config_log  = open("best_log.json", "w+")
     best_config_log.write("[\n")
+
+    tuning_init = True
+
+    seed_value = { 'cycles': penalty,
+                   'fmax': penalty,
+                   'lu': penalty,
+                   'pins': penalty,
+                   'regs': penalty,
+                   'block': penalty,
+                   'ram': penalty,
+                   'dsp': penalty,
+                   'value': penalty,
+                 }
 
     #legup_parameters.generate_seed()
     tuning_loop()
