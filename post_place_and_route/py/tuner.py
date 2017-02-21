@@ -46,9 +46,12 @@ def log_intermediate(current_time, manager):
         best_dsp_log.write("{0} {1}\n".format(current_time, current_best.dsp))
 
         best_config_log.write("{0},\n".format(json.dumps(current_best.configuration.data)))
+
         print current_time, current_best.time
 
 def save_final_configuration(configuration):
+    generate_file(current_best.configuration.data, ".")
+
     best_config_log.write("]")
     best_config_log.close()
 
@@ -270,5 +273,6 @@ if __name__ == '__main__':
 
     best_config_log  = open("best_log.json", "w+")
     best_config_log.write("[\n")
+
     #legup_parameters.generate_seed()
     tuning_loop()

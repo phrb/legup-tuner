@@ -7,7 +7,7 @@ parallel=1
 workers=1
 seed="seed.json"
 async="seq"
-iterations=1
+iterations=5
 
 for name in $names; do
     for i in $(seq 1 $iterations); do
