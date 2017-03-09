@@ -50,7 +50,7 @@ def log_intermediate(current_time, manager):
         print current_time, current_best.time
 
 def save_final_configuration(configuration):
-    generate_file(current_best.configuration.data, ".")
+    legup_parameters.generate_file(configuration, ".")
 
     best_config_log.write("]")
     best_config_log.close()
@@ -71,7 +71,7 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
 
         seed_values = { 'cycles': cycles,
                         'fmax': fmax,
-                        'wct': (cycles * (factor / fmax))
+                        'wct': (cycles * (factor / fmax)),
                         'lu': lu,
                         'pins': pins,
                         'regs': regs,
@@ -80,13 +80,14 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
                         'dsp': dsp,
                       }
 
-    value = ((cycles * (factor / fmax) / seed_values['wct']) + \
-            (lu / seed_value['lu']) +                          \
-            (pins / seed_value['pins']) +                      \
-            (regs / seed_value['regs']) +                      \
-            (block / seed_value['block']) +                    \
-            (ram / seed_value['ram']) +                        \
-            (dsp / seed_value['dsp'])) / 7
+    value = ((cycles * (factor / fmax)) / seed_values['wct'])
+    value += (lu / seed_values['lu'])
+    value += (pins / seed_values['pins'])
+    value += (regs / seed_values['regs'])
+    value += (block / seed_values['block'])
+    value += (ram / seed_values['ram'])
+    value += (dsp / seed_values['dsp'])
+    value /= 7.
 
     return value
 
@@ -318,16 +319,16 @@ if __name__ == '__main__':
 
     tuning_init = True
 
-    seed_value = { 'cycles': penalty,
-                   'fmax': penalty,
-                   'lu': penalty,
-                   'pins': penalty,
-                   'regs': penalty,
-                   'block': penalty,
-                   'ram': penalty,
-                   'dsp': penalty,
-                   'value': penalty,
-                 }
+    seed_values = { 'cycles': penalty,
+                    'fmax': penalty,
+                    'lu': penalty,
+                    'pins': penalty,
+                    'regs': penalty,
+                    'block': penalty,
+                    'ram': penalty,
+                    'dsp': penalty,
+                    'value': penalty,
+                  }
 
     #legup_parameters.generate_seed()
     tuning_loop()
