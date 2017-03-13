@@ -80,13 +80,41 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
                         'dsp': dsp,
                       }
 
-    value = ((cycles * (factor / fmax)) / seed_values['wct'])
-    value += (lu / seed_values['lu'])
-    value += (pins / seed_values['pins'])
-    value += (regs / seed_values['regs'])
-    value += (block / seed_values['block'])
-    value += (ram / seed_values['ram'])
-    value += (dsp / seed_values['dsp'])
+    if seed_values['wct'] != 0:
+        value = ((cycles * (factor / fmax)) / seed_values['wct'])
+    else:
+        value = 1
+
+    if seed_values['lu'] != 0:
+        value += (lu / seed_values['lu'])
+    else:
+        value += 1
+
+    if seed_values['pins'] != 0:
+        value += (pins / seed_values['pins'])
+    else:
+        value += 1
+
+    if seed_values['regs'] != 0:
+        value += (regs / seed_values['regs'])
+    else:
+        value += 1
+
+    if seed_values['block'] != 0:
+        value += (block / seed_values['block'])
+    else:
+        value += 1
+
+    if seed_values['ram'] != 0:
+        value += (ram / seed_values['ram'])
+    else:
+        value += 1
+
+    if seed_values['dsp'] != 0:
+        value += (dsp / seed_values['dsp'])
+    else:
+        value += 1
+
     value /= 7.
 
     return value
