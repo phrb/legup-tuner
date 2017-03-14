@@ -1,7 +1,11 @@
 *.swp
 *.pyc
 *.txt
-*.tcl
-final_config.json
+*.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+
 opentuner.*
 __pycache__
