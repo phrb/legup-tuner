@@ -99,7 +99,7 @@ def plot_bar(data,
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
-    ax.set_xticks(indexes + (1.5 * width))
+    ax.set_xticks(indexes + (1 * width))
     ax.set_ylabel(ylabel)
     ax.set_xticklabels(tick_labels)
 
@@ -117,18 +117,18 @@ def plot_bar(data,
 if __name__ == '__main__':
     config_matplotlib()
 
-    applications     = ["dfadd_5400_1",
-                        "dfdiv_5400_1",
-                        "dfmul_5400_1",
-                        "dfsin_5400_1",
+    applications     = ["dfadd_5400_5",
+                        "dfdiv_5400_4",
+                        "dfmul_5400_5",
+                        "dfsin_5400_2",
                         "gsm_5400_1",
                         "jpeg_5400_1",
-                        "mips_5400_1",
+                        "mips_5400_2",
                         "motion_5400_1",
                         "sha_5400_1",
                         "adpcm_5400_1",
-                        "aes_5400_1",
-                        "blowfish_5400_1"]
+                        "aes_5400_5",
+                        "blowfish_5400_2"]
 
     metrics          = [
                             { 'name': 'Normalized Sum of Metrics',
@@ -163,15 +163,15 @@ if __name__ == '__main__':
     for application in applications:
         print application
 
-        name          = "{0} Metrics during 1.5h of Tuning (Stratix V)".format(application.split("_")[0])
-        dest_filename = application.split("_")[0] + "_all_5400_chstone_StratixV"
+        name          = "{0} Metrics during 1.5h of Tuning (Cyclone V)".format(application.split("_")[0])
+        dest_filename = application.split("_")[0] + "_all_5400_chstone_CycloneV"
 
         data_x = []
         data_y = []
         labels = []
 
         for metric in metrics:
-            if metric['name'] != "Sum of All Metrics":
+            if metric['name'] != "Normalized Sum of Metrics":
                 print metric['name']
 
                 best_filename = metric['source_file']
@@ -216,8 +216,8 @@ if __name__ == '__main__':
 
         for application in applications:
             print application
-            name          = metric['name'] + " during 1.5h of Tuning (Stratix V, {0})".format(application.split("_")[0])
-            dest_filename = application.split("_")[0] + "_" + metric['dest_file'] + "_5400_chstone_StratixV"
+            name          = metric['name'] + " during 1.5h of Tuning (Cyclone V, {0})".format(application.split("_")[0])
+            dest_filename = application.split("_")[0] + "_" + metric['dest_file'] + "_5400_chstone_CycloneV"
             data_file = open("{0}/{1}".format(application, best_filename), "r")
             data      = data_file.readlines()
 
@@ -237,9 +237,9 @@ if __name__ == '__main__':
                      "Time (s)",
                      metric['name'])
 
-        if metric['name'] == 'Sum of All Metrics':
-            dest_filename = metric['dest_file'] + "_5400_chstone_StratixV"
-            name          = metric['name'] + " after 1.5h of Tuning (Stratix V)"
+        if metric['name'] == 'Normalized Sum of Metrics':
+            dest_filename = metric['dest_file'] + "_5400_chstone_CycloneV"
+            name          = metric['name'] + " after 1.5h of Tuning (Cyclone V)"
             speedups = []
 
             for application in applications:
@@ -249,12 +249,11 @@ if __name__ == '__main__':
                 data_file.close()
 
                 best      = float(data[-1].split()[1])
-                default   = float(data[0].split()[1])
 
-                if math.isnan(default / best) or default / best == float('inf'):
-                    speedups.append((application.split("_")[0], 0))
+                if best != float('inf'):
+                    speedups.append((application.split("_")[0], best))
                 else:
-                    speedups.append((application.split("_")[0], default / best))
+                    speedups.append((application.split("_")[0], 0))
 
             ymax = max([s[1] for s in speedups])
 
