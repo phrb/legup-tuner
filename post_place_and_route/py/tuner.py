@@ -140,6 +140,8 @@ def get_wallclock_time(cfg):
                                                            unique_id,
                                                            verilog_file)
 
+    print(docker_cmd)
+
     try:
         output = subprocess.check_output(docker_cmd, shell = True)
         output = output.split()
@@ -242,6 +244,8 @@ def tuning_loop():
     host_path        = "/home/bruelp/legup-tuner/post_place_and_route/py"
     image_name       = "legup_quartus"
     script_name      = "measure.sh"
+
+    print(application, container_path, application_path)
 
     for name in legup_parameters.parameters:
         parameter_type = legup_parameters.parameter_type(name)

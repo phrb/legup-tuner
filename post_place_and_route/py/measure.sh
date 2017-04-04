@@ -2,7 +2,7 @@
 
 cd .. > /dev/null
 
-rm config.tcl
+rm config.tcl > /dev/null
 cp tuner/config.tcl .
 
 MAKEV_T=600
