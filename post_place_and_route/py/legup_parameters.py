@@ -162,7 +162,7 @@ def generate_file(configuration, path):
     text     = "source ../../legup.tcl\n"
     text    += "source ../config.tcl\n"
     # Change the board:
-    text    += "set_project StratixV DE5-Net Tiger_DDR3\n"
+    # text    += "set_project StratixV DE5-Net Tiger_DDR3\n"
     text    += "set_parameter LOCAL_RAMS 1\n"
     text    += "set_parameter GROUP_RAMS 1\n"
     text    += "set_parameter GROUP_RAMS_SIMPLE_OFFSET 1\n"
