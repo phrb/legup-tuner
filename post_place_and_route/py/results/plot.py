@@ -141,7 +141,7 @@ if __name__ == '__main__':
                        "dfmul_5400_",
                        "dfsin_5400_",
                        "gsm_5400_",
-                       "jpeg_5400_",
+                       #"jpeg_5400_",
                        "mips_5400_",
                        "motion_5400_",
                        "sha_5400_",
@@ -180,136 +180,23 @@ if __name__ == '__main__':
                                'dest_file': 'fmax'},
                         ]
 
-    # For each metric, plot how it performed in each application
-    # using the absolute values
-    for metric in metrics:
-        best_filename = metric['source_file']
-        # For all metrics, plot the summary of absolute improvements for all
-        # applications in a single figure.
-        # For the Normalized Sum, plot the relative improvements
-        dest_filename = "rel_comp_" + metric['dest_file'] + "_5400_chstone_CycloneV"
-        name          = "Relative Improvement for " + metric['name'] + ", after 1.5h of Tuning (Cyclone V)"
-        default_speedups = []
-        random_speedups = []
+    boards = [["default_cycloneV", "random_cycloneV"], ["default_stratixV", "random_stratixV"]]
 
-        default_error = []
-        random_error = []
-
-        current_board = 'default_cycloneV'
-        random_board = 'random_cycloneV'
-
-        for i in range(len(applications)):
-            application = applications[i]
-
-            default_all_best = []
-            random_all_best = []
-
-            for j in range(1, runs + 1):
-                default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
-                                                      application,
-                                                      j,
-                                                      best_filename),
-                                                      "r")
-                default_data      = default_data_file.readlines()
-
-                random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
-                                                      application,
-                                                      j,
-                                                      best_filename),
-                                                      "r")
-                random_data      = random_data_file.readlines()
-
-                random_data_file.close()
-                default_data_file.close()
-
-                default_best     = float(default_data[-1].split()[1])
-                random_best      = float(random_data[-1].split()[1])
-
-                # Relative improvement already computed
-                if metric['name'] == 'Normalized Sum of Metrics':
-                    if default_best != float('inf'):
-                        default_all_best.append(default_best)
-
-                    if random_best != float('inf'):
-                        random_all_best.append(random_best)
-                else:
-                    # Compute relative improvements
-                    index = 0
-                    default_start = float(default_data[index].split()[1])
-                    index += 1
-
-                    while default_start == float('inf') and index < len(default_data):
-                        default_start = float(default_data[index].split()[1])
-                        index += 1
-
-                    index = 0
-                    random_start  = float(default_data[0].split()[1])
-                    index += 1
-
-                    while random_start == float('inf') and index < len(random_data):
-                        random_start = float(random_data[index].split()[1])
-                        index += 1
-
-                    if default_best != float('inf') and default_start != float(0) and default_start != float('inf'):
-                        default_all_best.append(default_best / default_start)
-
-                    if random_best != float('inf') and default_start != float(0) and random_start != float('inf'):
-                        random_all_best.append(random_best / random_start)
-
-            if len(default_all_best) > 0:
-                default_speedups.append((application.split("_")[0], numpy.mean(default_all_best)))
-                default_error.append((application.split("_")[0], numpy.std(default_all_best)))
-            else:
-                default_speedups.append((application.split("_")[0], 0))
-                default_error.append((application.split("_")[0], 0))
-
-            if len(random_all_best) > 0:
-                random_speedups.append((application.split("_")[0], numpy.mean(random_all_best)))
-                random_error.append((application.split("_")[0], numpy.std(random_all_best)))
-            else:
-                random_speedups.append((application.split("_")[0], 0))
-                random_error.append((application.split("_")[0], 0))
-
-        default_ymax = max([s[1] for s in default_speedups])
-        random_ymax = max([s[1] for s in random_speedups])
-
-        print(default_ymax, random_ymax)
-
-        ymax = max(default_ymax, random_ymax)
-
-        # Plot summary of relative improvements
-        plot_bar([s[1] for s in default_speedups],
-                 [s[1] for s in default_error],
-                 [s[1] for s in random_speedups],
-                 [s[1] for s in random_error],
-                 "CHStone Applications",
-                 "Improvement vs. Starting Point",
-                 len(default_speedups),
-                 .225,
-                 [s[0] for s in default_speedups],
-                 dest_filename,
-                 name,
-                 ymax,
-                 True)
-
-    # For each metric, plot how it performed in each application
-    # using the absolute values
-    for metric in metrics:
-        # Plot absolute values
-        if metric['name'] != 'Normalized Sum of Metrics':
+    for current_board, random_board in boards:
+        # For each metric, plot how it performed in each application
+        # using the absolute values
+        for metric in metrics:
             best_filename = metric['source_file']
-            # For all metrics, plot the summary of absolute final values for all
+            # For all metrics, plot the summary of absolute improvements for all
             # applications in a single figure.
-            dest_filename = "abs_comp_" + metric['dest_file'] + "_5400_chstone_CycloneV"
-            name          = "Final Values for " + metric['name'] + ", after 1.5h of Tuning (Cyclone V)"
+            # For the Normalized Sum, plot the relative improvements
+            dest_filename = "rel_comp_" + metric['dest_file'] + "_5400_chstone_" + current_board.split("_")[1]
+            name          = "Relative Improvement for " + metric['name'] + ", after 1.5h of Tuning ({0})".format(current_board.split("_")[1])
             default_speedups = []
             random_speedups = []
 
             default_error = []
             random_error = []
-
-            current_board = 'default_cycloneV'
-            random_board = 'random_cycloneV'
 
             for i in range(len(applications)):
                 application = applications[i]
@@ -319,17 +206,17 @@ if __name__ == '__main__':
 
                 for j in range(1, runs + 1):
                     default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
-                                                                      application,
-                                                                      j,
-                                                                      best_filename),
-                                                                      "r")
+                                                          application,
+                                                          j,
+                                                          best_filename),
+                                                          "r")
                     default_data      = default_data_file.readlines()
 
                     random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
-                                                                      application,
-                                                                      j,
-                                                                      best_filename),
-                                                                      "r")
+                                                          application,
+                                                          j,
+                                                          best_filename),
+                                                          "r")
                     random_data      = random_data_file.readlines()
 
                     random_data_file.close()
@@ -338,11 +225,36 @@ if __name__ == '__main__':
                     default_best     = float(default_data[-1].split()[1])
                     random_best      = float(random_data[-1].split()[1])
 
-                    if default_best != float('inf'):
-                        default_all_best.append(default_best)
+                    # Relative improvement already computed
+                    if metric['name'] == 'Normalized Sum of Metrics':
+                        if default_best != float('inf'):
+                            default_all_best.append(default_best)
 
-                    if random_best != float('inf'):
-                        random_all_best.append(random_best)
+                        if random_best != float('inf'):
+                            random_all_best.append(random_best)
+                    else:
+                        # Compute relative improvements
+                        index = 0
+                        default_start = float(default_data[index].split()[1])
+                        index += 1
+
+                        while default_start == float('inf') and index < len(default_data):
+                            default_start = float(default_data[index].split()[1])
+                            index += 1
+
+                        index = 0
+                        random_start  = float(default_data[0].split()[1])
+                        index += 1
+
+                        while random_start == float('inf') and index < len(random_data):
+                            random_start = float(random_data[index].split()[1])
+                            index += 1
+
+                        if default_best != float('inf') and default_start != float(0) and default_start != float('inf'):
+                            default_all_best.append(default_best / default_start)
+
+                        if random_best != float('inf') and default_start != float(0) and random_start != float('inf'):
+                            random_all_best.append(random_best / random_start)
 
                 if len(default_all_best) > 0:
                     default_speedups.append((application.split("_")[0], numpy.mean(default_all_best)))
@@ -365,9 +277,6 @@ if __name__ == '__main__':
 
             ymax = max(default_ymax, random_ymax)
 
-            if metric['name'] == 'Cycles':
-                ymax = 80000
-
             # Plot summary of relative improvements
             plot_bar([s[1] for s in default_speedups],
                      [s[1] for s in default_error],
@@ -381,4 +290,92 @@ if __name__ == '__main__':
                      dest_filename,
                      name,
                      ymax,
-                     False)
+                     True)
+
+        # For each metric, plot how it performed in each application
+        # using the absolute values
+        for metric in metrics:
+            # Plot absolute values
+            if metric['name'] != 'Normalized Sum of Metrics':
+                best_filename = metric['source_file']
+                # For all metrics, plot the summary of absolute final values for all
+                # applications in a single figure.
+                dest_filename = "abs_comp_" + metric['dest_file'] + "_5400_chstone_" + current_board.split("_")[1]
+                name          = "Final Values for " + metric['name'] + ", after 1.5h of Tuning ({0})".format(current_board.split("_")[1])
+                default_speedups = []
+                random_speedups = []
+
+                default_error = []
+                random_error = []
+
+                for i in range(len(applications)):
+                    application = applications[i]
+
+                    default_all_best = []
+                    random_all_best = []
+
+                    for j in range(1, runs + 1):
+                        default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
+                                                                          application,
+                                                                          j,
+                                                                          best_filename),
+                                                                          "r")
+                        default_data      = default_data_file.readlines()
+
+                        random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
+                                                                          application,
+                                                                          j,
+                                                                          best_filename),
+                                                                          "r")
+                        random_data      = random_data_file.readlines()
+
+                        random_data_file.close()
+                        default_data_file.close()
+
+                        default_best     = float(default_data[-1].split()[1])
+                        random_best      = float(random_data[-1].split()[1])
+
+                        if default_best != float('inf'):
+                            default_all_best.append(default_best)
+
+                        if random_best != float('inf'):
+                            random_all_best.append(random_best)
+
+                    if len(default_all_best) > 0:
+                        default_speedups.append((application.split("_")[0], numpy.mean(default_all_best)))
+                        default_error.append((application.split("_")[0], numpy.std(default_all_best)))
+                    else:
+                        default_speedups.append((application.split("_")[0], 0))
+                        default_error.append((application.split("_")[0], 0))
+
+                    if len(random_all_best) > 0:
+                        random_speedups.append((application.split("_")[0], numpy.mean(random_all_best)))
+                        random_error.append((application.split("_")[0], numpy.std(random_all_best)))
+                    else:
+                        random_speedups.append((application.split("_")[0], 0))
+                        random_error.append((application.split("_")[0], 0))
+
+                default_ymax = max([s[1] for s in default_speedups])
+                random_ymax = max([s[1] for s in random_speedups])
+
+                print(default_ymax, random_ymax)
+
+                ymax = max(default_ymax, random_ymax)
+
+                if metric['name'] == 'Cycles':
+                    ymax = 80000
+
+                # Plot summary of relative improvements
+                plot_bar([s[1] for s in default_speedups],
+                         [s[1] for s in default_error],
+                         [s[1] for s in random_speedups],
+                         [s[1] for s in random_error],
+                         "CHStone Applications",
+                         "Improvement vs. Starting Point",
+                         len(default_speedups),
+                         .225,
+                         [s[0] for s in default_speedups],
+                         dest_filename,
+                         name,
+                         ymax,
+                         False)
