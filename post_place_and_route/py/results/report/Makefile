@@ -3,7 +3,7 @@ BASE_NAME = report
 FILES     = *.tex img/*.pdf
 
 LATEX     = latex
-PDFLATEX  = xelatex
+PDFLATEX  = pdflatex
 BIBTEX    = bibtex
 
 pdf: $(BASE_NAME).pdf
