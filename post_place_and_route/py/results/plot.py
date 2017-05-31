@@ -138,7 +138,7 @@ def plot_heatmap(data,
     fig     = plt.figure(1, figsize=(18, 10))
     ax      = fig.add_subplot(111)
 
-    heatmap = plt.pcolor(data, cmap = plt.cm.hot, vmin = 0.2, vmax = 4.0)
+    heatmap = plt.pcolor(data, cmap = plt.cm.seismic, vmin = 0.0, vmax = 2.0)
     plt.colorbar()
 
     ax.set_yticks(np.arange(len(ylabels)) + 0.5, minor = False)
@@ -150,11 +150,12 @@ def plot_heatmap(data,
     ax.set_ylabel(ylabel)
     ax.set_yticklabels(ylabels, minor=False)
 
-    plt.xticks(rotation = 90)
+    #plt.xticks(rotation = 45)
+    plt.yticks(rotation = 45)
 
     plt.tight_layout()
 
-    fig.savefig("{0}.eps".format(file_title), format = 'eps', dpi = 2000)
+    fig.savefig("{0}.eps".format(file_title), format = 'eps', dpi = 2000, bbox_inches = 'tight')
 
     plt.clf()
 
