@@ -128,6 +128,37 @@ def plot_bar(data1,
 
     plt.clf()
 
+def plot_heatmap(data,
+                 xlabels,
+                 ylabels,
+                 xlabel,
+                 ylabel,
+                 file_title,
+                 title):
+    fig     = plt.figure(1, figsize=(18, 10))
+    ax      = fig.add_subplot(111)
+
+    heatmap = plt.pcolor(data, cmap = plt.cm.seismic, vmin = 0.0, vmax = 2.0)
+    plt.colorbar()
+
+    ax.set_yticks(np.arange(len(ylabels)) + 0.5, minor = False)
+    ax.set_xticks(np.arange(len(xlabels)) + 0.5, minor = False)
+
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_xticklabels(xlabels, minor=False)
+    ax.set_ylabel(ylabel)
+    ax.set_yticklabels(ylabels, minor=False)
+
+    #plt.xticks(rotation = 45)
+    plt.yticks(rotation = 45)
+
+    plt.tight_layout()
+
+    fig.savefig("{0}.eps".format(file_title), format = 'eps', dpi = 2000, bbox_inches = 'tight')
+
+    plt.clf()
+
 if __name__ == '__main__':
     config_matplotlib()
 
@@ -184,10 +215,15 @@ if __name__ == '__main__':
 
     for current_board, random_board in boards:
         # For each metric, plot how it performed in each application
-        # using the absolute values
+        # using relative improvements
+        default_heatmap = {}
+        random_heatmap = {}
         for metric in metrics:
+            default_heatmap[metric['name']] = []
+            random_heatmap[metric['name']] = []
+
             best_filename = metric['source_file']
-            # For all metrics, plot the summary of absolute improvements for all
+            # For all metrics, plot the summary of relative improvements for all
             # applications in a single figure.
             # For the Normalized Sum, plot the relative improvements
             dest_filename = "rel_comp_" + metric['dest_file'] + "_5400_chstone_" + current_board.split("_")[1]
@@ -205,70 +241,93 @@ if __name__ == '__main__':
                 random_all_best = []
 
                 for j in range(1, runs + 1):
-                    default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
-                                                          application,
-                                                          j,
-                                                          best_filename),
-                                                          "r")
-                    default_data      = default_data_file.readlines()
+                    if os.path.isfile("{0}/{1}{2}/{3}".format(current_board,
+                                                              application,
+                                                              j,
+                                                              best_filename)):
 
-                    random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
-                                                          application,
-                                                          j,
-                                                          best_filename),
-                                                          "r")
-                    random_data      = random_data_file.readlines()
+                        default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
+                                                              application,
+                                                              j,
+                                                              best_filename),
+                                                              "r")
+                        default_data = default_data_file.readlines()
+                        default_data_file.close()
+                        default_best = float(default_data[-1].split()[1])
 
-                    random_data_file.close()
-                    default_data_file.close()
-
-                    default_best     = float(default_data[-1].split()[1])
-                    random_best      = float(random_data[-1].split()[1])
-
-                    # Relative improvement already computed
-                    if metric['name'] == 'Normalized Sum of Metrics':
-                        if default_best != float('inf'):
-                            default_all_best.append(default_best)
-
-                        if random_best != float('inf'):
-                            random_all_best.append(random_best)
-                    else:
-                        # Compute relative improvements
-                        index = 0
-                        default_start = float(default_data[index].split()[1])
-                        index += 1
-
-                        while default_start == float('inf') and index < len(default_data):
+                        # Relative improvement already computed
+                        if metric['name'] == 'Normalized Sum of Metrics':
+                            if default_best != float('inf'):
+                                default_all_best.append(default_best)
+                        else:
+                            # Compute relative improvements
+                            index = 0
                             default_start = float(default_data[index].split()[1])
                             index += 1
 
-                        index = 0
-                        random_start  = float(default_data[0].split()[1])
-                        index += 1
+                            while default_start == float('inf') and index < len(default_data):
+                                default_start = float(default_data[index].split()[1])
+                                index += 1
 
-                        while random_start == float('inf') and index < len(random_data):
-                            random_start = float(random_data[index].split()[1])
+                            if default_best != float('inf') and default_start != float(0) and default_start != float('inf'):
+                                if metric['name'] != 'FMax':
+                                    default_all_best.append(default_best / default_start)
+                                else:
+                                    default_all_best.append(default_start / default_best)
+
+
+                    if os.path.isfile("{0}/{1}{2}/{3}".format(random_board,
+                                                              application,
+                                                              j,
+                                                              best_filename)):
+
+                        random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
+                                                              application,
+                                                              j,
+                                                              best_filename),
+                                                              "r")
+                        random_data      = random_data_file.readlines()
+
+                        random_data_file.close()
+                        random_best      = float(random_data[-1].split()[1])
+
+                        # Relative improvement already computed
+                        if metric['name'] == 'Normalized Sum of Metrics':
+                            if random_best != float('inf'):
+                                random_all_best.append(random_best)
+                        else:
+                            # Compute relative improvements
+                            index = 0
+                            random_start  = float(default_data[0].split()[1])
                             index += 1
 
-                        if default_best != float('inf') and default_start != float(0) and default_start != float('inf'):
-                            default_all_best.append(default_best / default_start)
+                            while random_start == float('inf') and index < len(random_data):
+                                random_start = float(random_data[index].split()[1])
+                                index += 1
 
-                        if random_best != float('inf') and default_start != float(0) and random_start != float('inf'):
-                            random_all_best.append(random_best / random_start)
+                            if random_best != float('inf') and default_start != float(0) and random_start != float('inf'):
+                                if metric['name'] != 'FMax':
+                                    random_all_best.append(random_best / random_start)
+                                else:
+                                    random_all_best.append(random_start / random_best)
 
                 if len(default_all_best) > 0:
+                    default_heatmap[metric['name']].append((application.split("_")[0], numpy.mean(default_all_best)))
                     default_speedups.append((application.split("_")[0], numpy.mean(default_all_best)))
                     default_error.append((application.split("_")[0], numpy.std(default_all_best)))
                 else:
-                    default_speedups.append((application.split("_")[0], 0))
-                    default_error.append((application.split("_")[0], 0))
+                    default_heatmap[metric['name']].append((application.split("_")[0], 1))
+                    default_speedups.append((application.split("_")[0], 1))
+                    default_error.append((application.split("_")[0], 1))
 
                 if len(random_all_best) > 0:
+                    random_heatmap[metric['name']].append((application.split("_")[0], numpy.mean(random_all_best)))
                     random_speedups.append((application.split("_")[0], numpy.mean(random_all_best)))
                     random_error.append((application.split("_")[0], numpy.std(random_all_best)))
                 else:
-                    random_speedups.append((application.split("_")[0], 0))
-                    random_error.append((application.split("_")[0], 0))
+                    random_heatmap[metric['name']].append((application.split("_")[0], 1))
+                    random_speedups.append((application.split("_")[0], 1))
+                    random_error.append((application.split("_")[0], 1))
 
             default_ymax = max([s[1] for s in default_speedups])
             random_ymax = max([s[1] for s in random_speedups])
@@ -291,6 +350,52 @@ if __name__ == '__main__':
                      name,
                      ymax,
                      True)
+
+        default_heatmap_data = []
+        default_heatmap_apps = []
+        default_heatmap_metr = []
+
+        for name in default_heatmap.keys():
+            metric_values = []
+            default_heatmap_apps.append(name)
+
+            for value in default_heatmap[name]:
+                metric_values.append(value[1])
+                if value[0] not in default_heatmap_metr:
+                    default_heatmap_metr.append(value[0])
+
+            default_heatmap_data.append(metric_values)
+
+        plot_heatmap(default_heatmap_data,
+                     default_heatmap_metr,
+                     default_heatmap_apps,
+                     "Applications",
+                     "Metrics",
+                     "heatmap_default_" + current_board.split("_")[1],
+                     "Final Relative Value to Default Start ({0})".format(current_board.split("_")[1]))
+
+        random_heatmap_data = []
+        random_heatmap_apps = []
+        random_heatmap_metr = []
+
+        for name in random_heatmap.keys():
+            metric_values = []
+            random_heatmap_apps.append(name)
+
+            for value in random_heatmap[name]:
+                metric_values.append(value[1])
+                if value[0] not in random_heatmap_metr:
+                    random_heatmap_metr.append(value[0])
+
+            random_heatmap_data.append(metric_values)
+
+        plot_heatmap(random_heatmap_data,
+                     random_heatmap_metr,
+                     random_heatmap_apps,
+                     "Applications",
+                     "Metrics",
+                     "heatmap_random_" + current_board.split("_")[1],
+                     "Final Relative Value to Random Start ({0})".format(current_board.split("_")[1]))
 
         # For each metric, plot how it performed in each application
         # using the absolute values
@@ -315,31 +420,39 @@ if __name__ == '__main__':
                     random_all_best = []
 
                     for j in range(1, runs + 1):
-                        default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
-                                                                          application,
-                                                                          j,
-                                                                          best_filename),
-                                                                          "r")
-                        default_data      = default_data_file.readlines()
+                        if os.path.isfile("{0}/{1}{2}/{3}".format(current_board,
+                                                                  application,
+                                                                  j,
+                                                                  best_filename)):
+                            default_data_file = open("{0}/{1}{2}/{3}".format(current_board,
+                                                                              application,
+                                                                              j,
+                                                                              best_filename),
+                                                                              "r")
+                            default_data = default_data_file.readlines()
+                            default_data_file.close()
+                            default_best = float(default_data[-1].split()[1])
 
-                        random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
-                                                                          application,
-                                                                          j,
-                                                                          best_filename),
-                                                                          "r")
-                        random_data      = random_data_file.readlines()
+                            if default_best != float('inf'):
+                                default_all_best.append(default_best)
 
-                        random_data_file.close()
-                        default_data_file.close()
+                        if os.path.isfile("{0}/{1}{2}/{3}".format(random_board,
+                                                                  application,
+                                                                  j,
+                                                                  best_filename)):
 
-                        default_best     = float(default_data[-1].split()[1])
-                        random_best      = float(random_data[-1].split()[1])
+                            random_data_file = open("{0}/{1}{2}/{3}".format(random_board,
+                                                                              application,
+                                                                              j,
+                                                                              best_filename),
+                                                                              "r")
+                            random_data      = random_data_file.readlines()
 
-                        if default_best != float('inf'):
-                            default_all_best.append(default_best)
+                            random_data_file.close()
+                            random_best      = float(random_data[-1].split()[1])
 
-                        if random_best != float('inf'):
-                            random_all_best.append(random_best)
+                            if random_best != float('inf'):
+                                random_all_best.append(random_best)
 
                     if len(default_all_best) > 0:
                         default_speedups.append((application.split("_")[0], numpy.mean(default_all_best)))
