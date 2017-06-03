@@ -66,6 +66,40 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
 
     factor = 1000.
 
+    weights = {
+                # irrelevant = 1
+                # low        = 2
+                # medium     = 4
+                # high       = 8
+                'area': {
+                            'wct': 2,
+                            'lu': 8,
+                            'pins': 1,
+                            'regs': 8,
+                            'block': 1,
+                            'ram': 8,
+                            'dsp': 8,
+                        },
+                'perflat': {
+                                'wct': 8,
+                                'lu': 2,
+                                'pins': 1,
+                                'regs': 8,
+                                'block': 1,
+                                'ram': 2,
+                                'dsp': 2,
+                           },
+                'perf': {
+                            'wct': 8,
+                            'lu': 2,
+                            'pins': 1,
+                            'regs': 4,
+                            'block': 1,
+                            'ram': 2,
+                            'dsp': 2,
+                        }
+              }
+
     if tuning_init:
         tuning_init = False
 
@@ -80,42 +114,44 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
                         'dsp': dsp,
                       }
 
+    scenario = 'area'
+
     if seed_values['wct'] != 0:
-        value = ((cycles * (factor / fmax)) / seed_values['wct'])
+        value = weights[scenario]['wct'] * ((cycles * (factor / fmax)) / seed_values['wct'])
     else:
-        value = 1
+        value = weights[scenario]['wct']
 
     if seed_values['lu'] != 0:
-        value += (lu / seed_values['lu'])
+        value += weights[scenario]['lu'] * (lu / seed_values['lu'])
     else:
-        value += 1
+        value += weights[scenario]['lu']
 
     if seed_values['pins'] != 0:
-        value += (pins / seed_values['pins'])
+        value += weights[scenario]['pins'] * (pins / seed_values['pins'])
     else:
-        value += 1
+        value += weights[scenario]['pins']
 
     if seed_values['regs'] != 0:
-        value += (regs / seed_values['regs'])
+        value += weights[scenario]['regs'] * (regs / seed_values['regs'])
     else:
-        value += 1
+        value += weights[scenario]['regs']
 
     if seed_values['block'] != 0:
-        value += (block / seed_values['block'])
+        value += weights[scenario]['block'] * (block / seed_values['block'])
     else:
-        value += 1
+        value += weights[scenario]['block']
 
     if seed_values['ram'] != 0:
-        value += (ram / seed_values['ram'])
+        value += weights[scenario]['ram'] * (ram / seed_values['ram'])
     else:
-        value += 1
+        value += weights[scenario]['ram']
 
     if seed_values['dsp'] != 0:
-        value += (dsp / seed_values['dsp'])
+        value += weights[scenario]['dsp'] * (dsp / seed_values['dsp'])
     else:
-        value += 1
+        value += weights[scenario]['dsp']
 
-    value /= 7.
+    value /= float(sum(weights[scenario].values()))
 
     return value
 
