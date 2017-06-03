@@ -7,10 +7,10 @@ parallel=1
 workers=1
 seed="seed.json"
 async="seq"
-iterations=5
+iterations=10
 
 for name in $names; do
-    for i in $(seq 1 $iterations); do
+    for i in $(seq 6 $iterations); do
         new_dir=$name\_$duration\_$i
         mkdir $new_dir
         python2 tuner.py \
@@ -21,8 +21,8 @@ for name in $names; do
             --processes=$workers \
             --no-dups \
             --verilog-file=$verilog_name \
-            --application=$name \
-            --seed-configuration="$seed"
+            --application=$name
+#            --seed-configuration="$seed"
 
         mv config.tcl log.txt log_details.txt opentuner.log best_log.txt best_cycles_log.txt best_fmax_log.txt best_lu_log.txt best_pins_log.txt best_regs_log.txt best_block_log.txt best_ram_log.txt best_dps_log.txt best_log.json $new_dir
         ./clean.sh
