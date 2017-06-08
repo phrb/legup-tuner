@@ -7,10 +7,10 @@ parallel=1
 workers=1
 seed="seed.json"
 async="seq"
-iterations=10
+iterations=6
 
 for name in $names; do
-    for i in $(seq 6 $iterations); do
+    for i in $(seq 1 $iterations); do
         new_dir=$name\_$duration\_$i
         mkdir $new_dir
         python2 tuner.py \

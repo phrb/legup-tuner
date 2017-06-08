@@ -121,37 +121,53 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
     else:
         value = weights[scenario]['wct']
 
+    print(value)
+
     if seed_values['lu'] != 0:
         value += weights[scenario]['lu'] * (lu / seed_values['lu'])
     else:
         value += weights[scenario]['lu']
+
+    print(value)
 
     if seed_values['pins'] != 0:
         value += weights[scenario]['pins'] * (pins / seed_values['pins'])
     else:
         value += weights[scenario]['pins']
 
+    print(value)
+
     if seed_values['regs'] != 0:
         value += weights[scenario]['regs'] * (regs / seed_values['regs'])
     else:
         value += weights[scenario]['regs']
+
+    print(value)
 
     if seed_values['block'] != 0:
         value += weights[scenario]['block'] * (block / seed_values['block'])
     else:
         value += weights[scenario]['block']
 
+    print(value)
+
     if seed_values['ram'] != 0:
         value += weights[scenario]['ram'] * (ram / seed_values['ram'])
     else:
         value += weights[scenario]['ram']
+
+    print(value)
 
     if seed_values['dsp'] != 0:
         value += weights[scenario]['dsp'] * (dsp / seed_values['dsp'])
     else:
         value += weights[scenario]['dsp']
 
+    print(value)
+
     value /= float(sum(weights[scenario].values()))
+
+    print(value)
 
     return value
 
