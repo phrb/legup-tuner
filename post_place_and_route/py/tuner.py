@@ -114,7 +114,7 @@ def relative_improvement_normalization(cycles, fmax, lu, pins,
                         'dsp': dsp,
                       }
 
-    scenario = 'area'
+    scenario = 'perflat'
 
     if seed_values['wct'] != 0:
         value = weights[scenario]['wct'] * ((cycles * (factor / fmax)) / seed_values['wct'])
