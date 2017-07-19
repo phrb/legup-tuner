@@ -138,8 +138,17 @@ def plot_heatmap(data,
     fig     = plt.figure(1, figsize=(18, 10))
     ax      = fig.add_subplot(111)
 
+    aux = data[-1]
+
+    data[-1] = data[-2]
+
+    data[-2] = aux
+
     heatmap = plt.pcolor(data, cmap = plt.cm.seismic, vmin = 0.0, vmax = 2.0)
     plt.colorbar()
+
+    ylabels = ["\\textbf{NSM}", "Blocks", "Cycles", "Regs", "Pins", "DSP", "FMax", "LUTs", "BRAM" ]
+    ylabels.reverse()
 
     ax.set_yticks(np.arange(len(ylabels)) + 0.5, minor = False)
     ax.set_xticks(np.arange(len(xlabels)) + 0.5, minor = False)
@@ -151,7 +160,7 @@ def plot_heatmap(data,
     ax.set_yticklabels(ylabels, minor=False)
 
     #plt.xticks(rotation = 45)
-    plt.yticks(rotation = 45)
+    #plt.yticks(rotation = 45)
 
     plt.tight_layout()
 
@@ -211,7 +220,7 @@ if __name__ == '__main__':
                                'dest_file': 'fmax'},
                         ]
 
-    boards = [["default_cycloneV", "random_cycloneV"], ["default_stratixV", "random_stratixV"]]
+    boards = [["default_stratixV_area", "random_cycloneV"], ["default_stratixV_perf", "random_stratixV_perflat"]]
 
     for current_board, random_board in boards:
         # For each metric, plot how it performed in each application
@@ -369,10 +378,11 @@ if __name__ == '__main__':
         plot_heatmap(default_heatmap_data,
                      default_heatmap_metr,
                      default_heatmap_apps,
-                     "Applications",
-                     "Metrics",
-                     "heatmap_default_" + current_board.split("_")[1],
-                     "Final Relative Value to Default Start ({0})".format(current_board.split("_")[1]))
+                     "CHStone Applications",
+                     "Quartus Metrics",
+                     "heatmap_" + current_board,
+                     "")
+                     #"Relative value to start ({0})".format(current_board.split("_")[1].title))
 
         random_heatmap_data = []
         random_heatmap_apps = []
@@ -394,8 +404,8 @@ if __name__ == '__main__':
                      random_heatmap_apps,
                      "Applications",
                      "Metrics",
-                     "heatmap_random_" + current_board.split("_")[1],
-                     "Final Relative Value to Random Start ({0})".format(current_board.split("_")[1]))
+                     "heatmap_" + current_board,
+                     "")
 
         # For each metric, plot how it performed in each application
         # using the absolute values
