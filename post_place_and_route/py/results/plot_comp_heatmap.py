@@ -35,14 +35,19 @@ def plot_heatmap(data,
     ax      = fig.add_subplot(111)
 
     heatmap = plt.pcolor(data, cmap = plt.cm.RdBu_r, vmin = 0.5, vmax = 1.5, edgecolors='gray')
-    plt.colorbar()
+    #plt.colorbar()
 
     for y in range(data.shape[0]):
         for x in range(data.shape[1]):
+            if data[y, x] <= 0.65 or data[y, x] >= 1.45:
+                cell_color = 'white'
+            else:
+                cell_color = 'black'
+
             plt.text(x + 0.5, y + 0.5, '%.2f' % data[y, x],
                     horizontalalignment='center',
                     verticalalignment='center',
-                    color='black',
+                    color=cell_color,
                     usetex=True
                     )
 
@@ -53,9 +58,9 @@ def plot_heatmap(data,
     ax.set_xticks(np.arange(len(xlabels)) + 0.5, minor = False)
 
     ax.set_title(title)
-    ax.set_xlabel(xlabel)
+    #ax.set_xlabel(xlabel)
     ax.set_xticklabels(xlabels, minor=False)
-    ax.set_ylabel(ylabel)
+    #ax.set_ylabel(ylabel)
     ax.set_yticklabels(ylabels, minor=False)
 
     #plt.xticks(rotation = 45)

@@ -29,7 +29,7 @@ def plot_heatmap(data,
                  file_title,
                  title):
 
-    print(data.shape)
+    #print(data.shape)
 
     fig     = plt.figure(1, figsize=(18, 10))
     ax      = fig.add_subplot(111)
@@ -41,14 +41,19 @@ def plot_heatmap(data,
 #    data[-2] = aux
 
     heatmap = plt.pcolor(data, cmap = plt.cm.RdBu_r, vmin = 0.5, vmax = 1.5, edgecolors='gray')
-    plt.colorbar()
+    #plt.colorbar()
 
     for y in range(data.shape[0]):
         for x in range(data.shape[1]):
+            if data[y, x] <= 0.65 or data[y, x] >= 1.45:
+                cell_color = 'white'
+            else:
+                cell_color = 'black'
+
             plt.text(x + 0.5, y + 0.5, '%.2f' % data[y, x],
                     horizontalalignment='center',
                     verticalalignment='center',
-                    color='black',
+                    color=cell_color,
                     usetex=True
                     )
 
@@ -59,9 +64,9 @@ def plot_heatmap(data,
     ax.set_xticks(np.arange(len(xlabels)) + 0.5, minor = False)
 
     ax.set_title(title)
-    ax.set_xlabel(xlabel)
+    #ax.set_xlabel(xlabel)
     ax.set_xticklabels(xlabels, minor=False)
-    ax.set_ylabel(ylabel)
+    #ax.set_ylabel(ylabel)
     ax.set_yticklabels(ylabels, minor=False)
 
     #plt.xticks(rotation = 45)
@@ -125,11 +130,11 @@ if __name__ == '__main__':
     boards = ["random_stratixV", "default_stratixV", "default_stratixV_area", "default_stratixV_perf", "default_stratixV_perflat"]
 
     for board in boards:
-        print(board)
+        #print(board)
         heatmap = {}
 
         for metric in metrics:
-            print(metric)
+            #print(metric)
             heatmap[metric['name']] = []
 
             best_filename = metric['source_file']
@@ -137,7 +142,7 @@ if __name__ == '__main__':
             error = []
 
             for i in range(len(applications)):
-                print(applications[i])
+                #print(applications[i])
                 application = applications[i]
 
                 all_best = []
@@ -179,31 +184,17 @@ if __name__ == '__main__':
 
                 if len(all_best) > 0:
                     heatmap[metric['name']].append((application.split("_")[0], numpy.mean(all_best)))
-                    #speedups.append((application.split("_")[0], numpy.mean(all_best)))
-                    #error.append((application.split("_")[0], numpy.std(all_best)))
                 else:
                     heatmap[metric['name']].append((application.split("_")[0], 1))
-                    #speedups.append((application.split("_")[0], 1))
-                    #error.append((application.split("_")[0], 1))
-
-            #ymax = max([s[1] for s in speedups])
-
-            #print(ymax)
 
         heatmap_data = []
         heatmap_apps = []
         heatmap_metr = []
 
-        print(heatmap)
-
-        #print(heatmap.keys())
-
         for name in heatmap.keys():
             app_values = []
-            #heatmap_apps.append(name)
             heatmap_metr.append(name)
 
-            #print(heatmap[name])
             for value in heatmap[name]:
                 app_values.append(value[1])
                 if value[0] not in heatmap_apps:
@@ -211,9 +202,11 @@ if __name__ == '__main__':
 
             heatmap_data.append(app_values)
 
-        print(heatmap_apps)
-        print(heatmap_metr)
-        print(heatmap_data)
+            if name == "Normalized Sum of Metrics":
+                print(board)
+                print((1 - numpy.mean(app_values)) * 100)
+                print((1 - min(app_values)) * 100)
+
         plot_heatmap(numpy.transpose(heatmap_data),
                      heatmap_apps,
                      heatmap_metr,
