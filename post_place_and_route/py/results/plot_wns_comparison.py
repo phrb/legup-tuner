@@ -29,10 +29,16 @@ def plot_heatmap(data,
                  file_title,
                  title):
 
-    print(data.shape)
+    #print(data.shape)
 
     fig     = plt.figure(1, figsize=(18, 10))
     ax      = fig.add_subplot(111)
+
+#    aux = data[-1]
+#
+#    data[-1] = data[-2]
+#
+#    data[-2] = aux
 
     heatmap = plt.pcolor(data, cmap = plt.cm.RdBu_r, vmin = 0.5, vmax = 1.5, edgecolors='gray')
     #plt.colorbar()
@@ -50,19 +56,16 @@ def plot_heatmap(data,
                     color=cell_color,
                     usetex=True,
                     fontsize=44,
-                    weight='black'
+                    fontweight='bold'
                     )
 
-    xlabels = ["\\textit{FMax}", "\\textit{DSP}", "\\textit{Cycles}",
-               "\\textit{Blocks}", "\\textit{Regs}", "\\textit{BRAM}",
-               "\\textit{Pins}", "\\textit{LUTs}"]
-    xlabels.reverse()
+    xlabels = ["\\textit{Balanced}", "\\textit{Area}", "\\textit{Performance}", "\\textit{Perf. \\& Lat.}"]
 
     ax.set_yticks(np.arange(len(ylabels)) + 0.5, minor = False)
     ax.set_xticks(np.arange(len(xlabels)) + 0.5, minor = False)
 
     ax.set_title(title)
-    #ax.set_xlabel(xlabel)
+    ax.set_xlabel(xlabel)
     ax.set_xticklabels(xlabels, minor=False)
     #ax.set_ylabel(ylabel)
     ax.set_yticklabels(ylabels, minor=False)
@@ -96,6 +99,9 @@ if __name__ == '__main__':
                       ]
 
     metrics           = [
+                             { 'name': 'Normalized Sum of Metrics',
+                               'source_file': 'best_log.txt',
+                               'dest_file': 'nsam'},
                              { 'name': 'Logic Utilization',
                                'source_file': 'best_lu_log.txt',
                                'dest_file': 'lu'},
@@ -122,108 +128,78 @@ if __name__ == '__main__':
                                'dest_file': 'fmax'},
                         ]
 
-    boards = ["random_stratixV", "default_stratixV"]
+    boards = ["default_stratixV", "default_stratixV_area", "default_stratixV_perf", "default_stratixV_perflat"]
 
-    heatmaps = {}
+    heatmap = {}
 
     for board in boards:
-        print(board)
-        heatmaps[board] = {}
-        heatmap = heatmaps[board]
+        #print(board)
+        scenario = board.split("_")[-1]
+        metric = metrics[0]
 
-        for metric in metrics:
-            print(metric)
-            heatmap[metric['name']] = []
+            #print(metric)
+        heatmap[metric['name'] + "_" + scenario] = []
 
-            best_filename = metric['source_file']
-            speedups = []
-            error = []
+        best_filename = metric['source_file']
+        speedups = []
+        error = []
 
-            for i in range(len(applications)):
-                print(applications[i])
-                application = applications[i]
+        for i in range(len(applications)):
+            #print(applications[i])
+            application = applications[i]
 
-                all_best = []
+            all_best = []
 
-                for j in range(1, runs + 1):
-                    if os.path.isfile("{0}/{1}{2}/{3}".format(board,
-                                                              application,
-                                                              j,
-                                                              best_filename)):
+            for j in range(1, runs + 1):
+                if os.path.isfile("{0}/{1}{2}/{3}".format(board,
+                                                          application,
+                                                          j,
+                                                          best_filename)):
 
-                        data_file = open("{0}/{1}{2}/{3}".format(board,
-                                                                 application,
-                                                                 j,
-                                                                 best_filename),
-                                                                 "r")
-                        data = data_file.readlines()
-                        data_file.close()
-                        best = float(data[-1].split()[1])
+                    data_file = open("{0}/{1}{2}/{3}".format(board,
+                                                             application,
+                                                             j,
+                                                             best_filename),
+                                                             "r")
+                    data = data_file.readlines()
+                    data_file.close()
+                    best = float(data[-1].split()[1])
 
+                    if best != float('inf'):
                         all_best.append(best)
 
-                if len(all_best) > 0:
-                    heatmap[metric['name']].append((application.split("_")[0], numpy.mean(all_best)))
-                    #speedups.append((application.split("_")[0], numpy.mean(all_best)))
-                    #error.append((application.split("_")[0], numpy.std(all_best)))
-                else:
-                    heatmap[metric['name']].append((application.split("_")[0], 1))
-                    #speedups.append((application.split("_")[0], 1))
-                    #error.append((application.split("_")[0], 1))
-
-            #ymax = max([s[1] for s in speedups])
-
-            #print(ymax)
+            if len(all_best) > 0:
+                heatmap[metric['name'] + "_" + scenario].append((application.split("_")[0], numpy.mean(all_best)))
+            else:
+                heatmap[metric['name'] + "_" + scenario].append((application.split("_")[0], 1))
 
     heatmap_data = []
     heatmap_apps = []
     heatmap_metr = []
 
-    heatmap = heatmaps['random_stratixV']
-
-    print(heatmap)
-
-    #print(heatmap.keys())
-
     for name in heatmap.keys():
         app_values = []
-        #heatmap_apps.append(name)
         heatmap_metr.append(name)
 
-        #print(heatmap[name])
-        for random_value, default_value in zip(heatmaps['random_stratixV'][name], heatmaps['default_stratixV'][name]):
-            print(random_value, default_value)
-            if random_value[1] == float('inf') and default_value != float('inf'):
-                app_values.append(0.5)
-            elif random_value[1] != float('inf') and default_value == float('inf'):
-                app_values.append(1.5)
-            elif name == "FMax" and (random_value[1] < default_value[1]):
-                #app_values.append(0.5)
-                app_values.append(random_value[1] / default_value[1])
-            elif name == "FMax" and (random_value[1] > default_value[1]):
-                #app_values.append(1.5)
-                app_values.append(random_value[1] / default_value[1])
-            elif random_value[1] > default_value[1]:
-                #app_values.append(0.5)
-                app_values.append(default_value[1] / random_value[1])
-            elif random_value[1] < default_value[1]:
-                #app_values.append(1.5)
-                app_values.append(default_value[1] / random_value[1])
-            else:
-                app_values.append(1.0)
-
-            if "\\textit{" + random_value[0] + "}" not in heatmap_apps:
-                heatmap_apps.append("\\textit{" + random_value[0] + "}")
+        for value in heatmap[name]:
+            app_values.append(value[1])
+            if "\\textit{" + value[0] + "}" not in heatmap_apps:
+                heatmap_apps.append("\\textit{" + value[0] + "}")
 
         heatmap_data.append(app_values)
 
-    print(heatmap_apps)
-    print(heatmap_metr)
     print(heatmap_data)
+    print(heatmap_apps)
+
+    for line in heatmap_data:
+        line.insert(0, numpy.mean(line))
+
+    heatmap_apps.insert(0, "Mean")
+
     plot_heatmap(numpy.transpose(heatmap_data),
                  heatmap_apps,
                  heatmap_metr,
                  "CHStone Applications",
-                 "Quartus Metrics",
-                 "heatmap_comp_stratixV",
+                 "",
+                 "heatmap_wns_comparison",
                  "")

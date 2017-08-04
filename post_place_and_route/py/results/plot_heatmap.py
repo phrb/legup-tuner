@@ -54,10 +54,14 @@ def plot_heatmap(data,
                     horizontalalignment='center',
                     verticalalignment='center',
                     color=cell_color,
-                    usetex=True
+                    usetex=True,
+                    fontsize=44,
+                    fontweight='bold'
                     )
 
-    xlabels = ["FMax", "DSP", "Cycles", "Blocks", "Regs", "BRAM", "Pins", "LUTs", "\\textbf{WNS}"]
+    xlabels = ["\\textit{FMax}", "\\textit{DSP}", "\\textit{Cycles}",
+               "\\textit{Blocks}", "\\textit{Regs}", "\\textit{BRAM}",
+               "\\textit{Pins}", "\\textit{LUTs}", "\\textbf{WNS}"]
     xlabels.reverse()
 
     ax.set_yticks(np.arange(len(ylabels)) + 0.5, minor = False)
@@ -197,8 +201,8 @@ if __name__ == '__main__':
 
             for value in heatmap[name]:
                 app_values.append(value[1])
-                if value[0] not in heatmap_apps:
-                    heatmap_apps.append(value[0])
+                if "\\textit{" + value[0] + "}" not in heatmap_apps:
+                    heatmap_apps.append("\\textit{" + value[0] + "}")
 
             heatmap_data.append(app_values)
 
