@@ -34,24 +34,38 @@ def plot_heatmap(data,
     fig     = plt.figure(1, figsize=(18, 10))
     ax      = fig.add_subplot(111)
 
-    heatmap = plt.pcolor(data, cmap = plt.cm.RdBu_r, vmin = 0.5, vmax = 1.5, edgecolors='gray')
-    #plt.colorbar()
-
     for y in range(data.shape[0]):
         for x in range(data.shape[1]):
-            if data[y, x] <= 0.65 or data[y, x] >= 1.45:
-                cell_color = 'white'
-            else:
+            if data[y, x] == 0.5:
                 cell_color = 'black'
+                data[y, x] = 1.0
 
-            plt.text(x + 0.5, y + 0.5, '%.2f' % data[y, x],
-                    horizontalalignment='center',
-                    verticalalignment='center',
-                    color=cell_color,
-                    usetex=True,
-                    fontsize=44,
-                    weight='black'
-                    )
+                plt.text(x + 0.5, y + 0.5, '--',
+                        horizontalalignment='center',
+                        verticalalignment='center',
+                        color=cell_color,
+                        usetex=True,
+                        fontsize=44,
+                        weight='black'
+                        )
+
+            else:
+                if data[y, x] <= 0.65 or data[y, x] >= 1.45:
+                    cell_color = 'white'
+                else:
+                    cell_color = 'black'
+
+                plt.text(x + 0.5, y + 0.5, '%.2f' % data[y, x],
+                        horizontalalignment='center',
+                        verticalalignment='center',
+                        color=cell_color,
+                        usetex=True,
+                        fontsize=44,
+                        weight='black'
+                        )
+
+    heatmap = plt.pcolor(data, cmap = plt.cm.RdBu_r, vmin = 0.5, vmax = 1.5, edgecolors='gray')
+    #plt.colorbar()
 
     xlabels = ["\\textit{FMax}", "\\textit{DSP}", "\\textit{Cycles}",
                "\\textit{Blocks}", "\\textit{Regs}", "\\textit{BRAM}",
@@ -160,14 +174,15 @@ if __name__ == '__main__':
                         data_file.close()
                         best = float(data[-1].split()[1])
 
+                    if best != float('inf'):
                         all_best.append(best)
 
-                if len(all_best) > 0:
+                if len(all_best) >= 1:
                     heatmap[metric['name']].append((application.split("_")[0], numpy.mean(all_best)))
                     #speedups.append((application.split("_")[0], numpy.mean(all_best)))
                     #error.append((application.split("_")[0], numpy.std(all_best)))
                 else:
-                    heatmap[metric['name']].append((application.split("_")[0], 1))
+                    heatmap[metric['name']].append((application.split("_")[0], float('inf')))
                     #speedups.append((application.split("_")[0], 1))
                     #error.append((application.split("_")[0], 1))
 
@@ -181,8 +196,6 @@ if __name__ == '__main__':
 
     heatmap = heatmaps['random_stratixV']
 
-    print(heatmap)
-
     #print(heatmap.keys())
 
     for name in heatmap.keys():
@@ -192,7 +205,6 @@ if __name__ == '__main__':
 
         #print(heatmap[name])
         for random_value, default_value in zip(heatmaps['random_stratixV'][name], heatmaps['default_stratixV'][name]):
-            print(random_value, default_value)
             if random_value[1] == float('inf') and default_value != float('inf'):
                 app_values.append(0.5)
             elif random_value[1] != float('inf') and default_value == float('inf'):
@@ -209,6 +221,8 @@ if __name__ == '__main__':
             elif random_value[1] < default_value[1]:
                 #app_values.append(1.5)
                 app_values.append(default_value[1] / random_value[1])
+            elif not random_value[1] == default_value[1] and math.isnan(random_value[1] / default_value[1]):
+                app_values.append(0.5)
             else:
                 app_values.append(1.0)
 
@@ -217,8 +231,6 @@ if __name__ == '__main__':
 
         heatmap_data.append(app_values)
 
-    print(heatmap_apps)
-    print(heatmap_metr)
     print(heatmap_data)
     plot_heatmap(numpy.transpose(heatmap_data),
                  heatmap_apps,
