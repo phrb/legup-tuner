@@ -84,7 +84,9 @@ if __name__ == '__main__':
 
     runs = 10
 
-    applications   =  ["dfadd_5400_",
+    applications   =  [
+                       "blowfish_5400_",
+                       "dfadd_5400_",
                        "dfdiv_5400_",
                        "dfmul_5400_",
                        "dfsin_5400_",
@@ -95,7 +97,6 @@ if __name__ == '__main__':
                        "sha_5400_",
                        "adpcm_5400_",
                        "aes_5400_",
-                       "blowfish_5400_"
                       ]
 
     metrics           = [
