@@ -6,7 +6,8 @@ runs         <- 10
 tuning_time  <- 5400
 repository   <- "~/code/legup-tuner"
 results      <- "post_place_and_route/py/results"
-experiments  <- c("default_stratixV_perf")
+experiments  <- c("default_stratixV_perf", "deafult_stratixV_perflat",
+                  "default_stratixV_area", "default_stratixV_balanced")
 applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
                   "dfsin", "aes", "blowfish", "gsm", "mips")
 
@@ -30,6 +31,8 @@ cbind.fill <- function(...){
 }
 
 for (experiment in experiments) {
+    dir.create(strsplit(experiment, "_")[[1]][3])
+
     for (application in applications) {
         data <- data.frame()
 
@@ -64,7 +67,7 @@ for (experiment in experiments) {
         }
 
         write.csv(data, file = paste(paste(strsplit(experiment, "_")[[1]][3],
-                                           application, sep = "_"), ".csv",
+                                                    application, sep = "/"), ".csv",
                                      sep = ""))
     }
 }
