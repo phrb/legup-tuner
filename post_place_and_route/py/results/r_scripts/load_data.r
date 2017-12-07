@@ -1,12 +1,13 @@
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(jsonlite)
 
 runs         <- 10
 tuning_time  <- 5400
 repository   <- "~/code/legup-tuner"
 results      <- "post_place_and_route/py/results"
-experiments  <- c("default_stratixV_perf", "deafult_stratixV_perflat",
+experiments  <- c("default_stratixV_perf", "default_stratixV_perflat",
                   "default_stratixV_area", "default_stratixV_balanced")
 applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
                   "dfsin", "aes", "blowfish", "gsm", "mips")
@@ -37,6 +38,15 @@ for (experiment in experiments) {
         data <- data.frame()
 
         for (iteration in 1:runs) {
+            target_file <- (paste(repository, results, experiment,
+                                  paste(application, tuning_time,
+                                        iteration, sep = "_"),
+                                  json_configurations, sep = "/"))
+
+            if (file.exists(target_file)) {
+                configuration <- fromJSON(target_file)
+            }
+
             columns <- data.frame()
 
             for (measurement in txt_measurements) {
@@ -57,6 +67,8 @@ for (experiment in experiments) {
 
             if (ncol(columns) != 0) {
                 colnames(columns) <- headers
+
+                columns = cbind.fill(configuration, columns)
 
                 if (nrow(data) == 0) {
                     data <- columns
