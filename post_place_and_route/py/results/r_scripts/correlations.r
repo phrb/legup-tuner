@@ -2,7 +2,6 @@ library(dplyr)
 
 setEPS()
 postscript("correlations.eps", width = 16, height = 11)
-dev.size()
 
 #
 # Function adapted from:
