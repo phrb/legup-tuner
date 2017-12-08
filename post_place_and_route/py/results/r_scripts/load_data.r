@@ -9,7 +9,7 @@ tuning_time  <- 5400
 repository   <- "~/code/legup-tuner"
 results      <- "post_place_and_route/py/results"
 
-output_dir   <- "data"
+output_dir   <- paste(repository, results, "r_scripts/data", sep = "/")
 
 experiments  <- c("default_stratixV_perf", "default_stratixV_perflat",
                   "default_stratixV_area", "default_stratixV_balanced")
