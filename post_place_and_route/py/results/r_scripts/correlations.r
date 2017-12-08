@@ -1,5 +1,9 @@
 library(dplyr)
 
+setEPS()
+postscript("correlations.eps", width = 16, height = 11)
+dev.size()
+
 #
 # Function adapted from:
 #
@@ -68,7 +72,7 @@ print("120 Largest Correlations:")
 print("Scatter Plots of the 10 Largest Correlations")
 short_correlation <- correlation[1:30, ]
 
-old.par <- par(mfrow=c(5, 6))
+old.par <- par(mfrow = c(5, 6))
 
 for (i in 1:nrow(short_correlation)) {
     first  <- as.character(short_correlation[i, 'First.Variable'])
@@ -78,3 +82,4 @@ for (i in 1:nrow(short_correlation)) {
 }
 
 par(old.par)
+dev.off()
