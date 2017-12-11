@@ -67,8 +67,6 @@ plot_application_correlations <- function() {
             }
         }
 
-        names <- c("WNS","RAM")
-        idx   <- match(names, names(data))
         data  <- sapply(data, as.numeric)
 
         correlation <- sorted_correlations(data, 120)
@@ -79,7 +77,7 @@ plot_application_correlations <- function() {
         write.csv(correlation, file = paste(paste(plot_dir, collapse = ""),
                                             paste("correlations_", application,
                                                   ".csv", sep = ""), sep = "/"))
-        print(paste("Generating scatter spots of the 30 strongest correlations for '",
+        print(paste("Generating scatter plots of the 30 strongest correlations for '",
                     application, "'...", sep = ""))
 
         print(paste(paste("CSV generated at ", plot_dir, collapse = "",
