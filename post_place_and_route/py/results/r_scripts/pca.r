@@ -49,7 +49,7 @@ plot_scree_pca <- function() {
 
         data.pca <- prcomp(t(na.omit(t(standardised_data))))
 
-        print(paste("Generating scree plots of the 30 strongest correlations for '",
+        print(paste("Generating scree plots of PCA for '",
                     application, "'...", sep = ""))
 
         postscript(paste(paste(plot_dir, collapse = ""), paste("scree_",
