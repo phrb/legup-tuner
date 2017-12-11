@@ -18,7 +18,7 @@ applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
 hardware_metrics <- c("WNS", "Cycles", "FMax", "LUs", "Pins", "Regs", "Blocks",
                       "RAM", "DPS")
 
-plot_application_correlations <- function() {
+plot_scree_pca <- function() {
     dir.create(paste(plot_dir, collapse = ""))
 
     for (application in applications) {
@@ -65,4 +65,4 @@ plot_application_correlations <- function() {
     }
 }
 
-plot_application_correlations()
+plot_scree_pca()
