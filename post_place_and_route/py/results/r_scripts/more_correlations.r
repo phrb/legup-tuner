@@ -44,7 +44,7 @@ sorted_correlations <- function(data, datapoints) {
          n = datapoints)
 }
 
-plot_correlations <- function(application, experiments, cor_method, name,
+plot_correlations <- function(application, experiments, cor_method,
                               plot_columns) {
     data       <- data.frame()
 
@@ -79,12 +79,12 @@ plot_correlations <- function(application, experiments, cor_method, name,
                 "'...", sep = ""))
 
     write.csv(correlation, file = paste(paste(plot_dir, collapse = ""),
-                                        paste(name, "_", application,
+                                        paste(cor_method, "_", application,
                                               ".csv", sep = ""), sep = "/"))
 
     print(paste(paste("CSV generated at ", 
                       paste(plot_dir, collapse = ""),
-                      sep = ""), paste(name, "_", application,
+                      sep = ""), paste(cor_method, "_", application,
                                        ".csv", sep = ""),
                 sep = "/"))
 
@@ -94,7 +94,7 @@ plot_correlations <- function(application, experiments, cor_method, name,
                 plot_columns, " strongest correlations for '",
                 application, "'...", sep = ""))
 
-    postscript(paste(paste(plot_dir, collapse = ""), paste(name,
+    postscript(paste(paste(plot_dir, collapse = ""), paste(cor_method,
                                                            "_",
                                                            application,
                                                            ".eps",
@@ -111,13 +111,32 @@ plot_correlations <- function(application, experiments, cor_method, name,
 
     print(paste(paste("Plot generated at ",
                       paste(plot_dir, collapse = ""),
-                      sep = ""), paste(name, "_", application,
+                      sep = ""), paste(cor_method, "_", application,
                                        ".eps", sep = ""),
                 sep = "/"))
 
     dev.off()
+    
+    return(short_correlation)
 }
 
-plot_correlations("dfdiv", experiments, "pearson", "pearson", 10)
-plot_correlations("dfdiv", experiments, "spearman", "spearman", 10)
-plot_correlations("dfdiv", experiments, "kendall", "kendall", 10)
+cor_pearson <- plot_correlations("dfdiv", experiments, "pearson", 10)
+cor_spearman <- plot_correlations("dfdiv", experiments, "spearman", 10)
+cor_kendall <- plot_correlations("dfdiv", experiments, "kendall", 10)
+
+print(cor_pearson)
+print(cor_spearman)
+print(cor_kendall)
+
+inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
+           cor_spearman[ c("First.Variable", "Second.Variable")])
+
+inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
+           cor_kendall[ c("First.Variable", "Second.Variable")])
+
+inner_join(cor_spearman[ c("First.Variable", "Second.Variable")],
+           cor_kendall[ c("First.Variable", "Second.Variable")])
+
+inner_join(inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
+           cor_spearman[ c("First.Variable", "Second.Variable")]),
+           cor_kendall[ c("First.Variable", "Second.Variable")])
