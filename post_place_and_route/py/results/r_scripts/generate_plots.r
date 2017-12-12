@@ -120,13 +120,11 @@ ggplot(data=data, aes(y=Regs, x=set_operation_latency.signed_multiply_64, color=
     geom_smooth(aes(x=as.numeric(set_operation_latency.signed_multiply_64)), method="lm", formula=y~x+I(1/(x+1))) +
     theme_bw()
 
-library(ggplot2)
 ggplot(data=data, aes(y=Regs, x=set_operation_latency.signed_add_64, color=set_operation_latency.signed_multiply_64)) +
     geom_jitter(aes(x=as.factor(set_operation_latency.signed_add_64))) +
     geom_smooth(aes(x=as.numeric(set_operation_latency.signed_add_64)), method="lm", formula=y~x) +
     theme_bw()
 
-library(ggplot2)
 ggplot(data=data[data$set_operation_latency.signed_multiply_64 ==1,], aes(y=Regs, x=set_operation_latency.signed_add_64)) +
     geom_jitter(aes(x=as.factor(set_operation_latency.signed_add_64))) +
     geom_smooth(aes(x=as.numeric(set_operation_latency.signed_add_64)), method="lm", formula=y~x) +
