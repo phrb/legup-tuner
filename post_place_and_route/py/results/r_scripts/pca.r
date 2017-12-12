@@ -1,12 +1,16 @@
+repository_dir <- "/home/phrb/org/journal"
+
 library(dplyr)
 
 setEPS()
 
-csv_dir <- c("~/code/legup-tuner/",
+csv_dir <- c(repository_dir,
+             "/legup-tuner/",
              "post_place_and_route/py/results/r_scripts/",
              "data")
 
-plot_dir <- c("~/code/legup-tuner/",
+plot_dir <- c(repository_dir,
+              "/legup-tuner/",
              "post_place_and_route/py/results/r_scripts/",
              "scree_plots")
 
@@ -18,6 +22,15 @@ applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
 hardware_metrics <- c("WNS", "Cycles", "FMax", "LUs", "Pins", "Regs", "Blocks",
                       "RAM", "DPS")
 
+load_data <- function(application, experiment) {
+    return(as.data.frame(read.csv(paste(paste(csv_dir, collapse = ""),
+                                        experiment, paste(application,
+                                                          ".csv",
+                                                          sep = ""),
+                                        sep = "/"),
+                                  header = TRUE, sep = ",")))
+}
+
 plot_scree_pca <- function() {
     dir.create(paste(plot_dir, collapse = ""))
 
@@ -25,14 +38,7 @@ plot_scree_pca <- function() {
         data <- data.frame()
 
         for (experiment in experiments) {
-            new_data <- read.csv(paste(paste(csv_dir, collapse = ""),
-                                       experiment, paste(application,
-                                                         ".csv",
-                                                         sep = ""),
-                                       sep = "/"),
-                                 header = TRUE, sep = ",")
-
-            new_data <- as.data.frame(new_data)
+            new_data <- load_data(application, experiment)
             new_data <- new_data[is.finite(new_data$WNS),]
 
             if (ncol(data) == 0) {
