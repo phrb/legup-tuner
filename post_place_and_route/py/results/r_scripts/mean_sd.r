@@ -1,6 +1,9 @@
+repository_dir <- "/home/phrb/org/journal"
+
 library(dplyr)
 
-csv_dir <- c("~/code/legup-tuner/",
+csv_dir <- c(repository_dir,
+             "/legup-tuner/",
              "post_place_and_route/py/results/r_scripts/",
              "data")
 
