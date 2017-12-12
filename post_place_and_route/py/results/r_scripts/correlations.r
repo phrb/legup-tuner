@@ -1,6 +1,23 @@
+repository_dir <- "/home/phrb/org/journal"
+
 library(dplyr)
 
 setEPS()
+
+csv_dir <- c(repository_dir,
+             "/legup-tuner/",
+             "post_place_and_route/py/results/r_scripts/",
+             "data")
+
+plot_dir <- c(repository_dir,
+              "/legup-tuner/",
+              "post_place_and_route/py/results/r_scripts/",
+              "correlations")
+
+experiments <- c("balanced", "area", "perf", "perflat")
+
+applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
+                  "dfsin", "aes", "blowfish", "gsm", "mips")
 
 #
 # Function adapted from:
@@ -28,19 +45,6 @@ sorted_correlations <- function(data, datapoints) {
 
     head(fm[order(abs(fm$Correlation), decreasing = T), ], n = datapoints)
 }
-
-csv_dir <- c("~/code/legup-tuner/",
-             "post_place_and_route/py/results/r_scripts/",
-             "data")
-
-plot_dir <- c("~/code/legup-tuner/",
-             "post_place_and_route/py/results/r_scripts/",
-             "correlations")
-
-experiments <- c("balanced", "area", "perf", "perflat")
-
-applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
-                  "dfsin", "aes", "blowfish", "gsm", "mips")
 
 plot_application_correlations <- function() {
     dir.create(paste(plot_dir, collapse = ""))
@@ -80,7 +84,8 @@ plot_application_correlations <- function() {
         print(paste("Generating scatter plots of the 30 strongest correlations for '",
                     application, "'...", sep = ""))
 
-        print(paste(paste("CSV generated at ", plot_dir, collapse = "",
+        print(paste(paste("CSV generated at ", 
+                          paste(plot_dir, collapse = ""),
                           sep = ""), paste("correlations_", application,
                                            ".csv", sep = ""),
                     sep = "/"))
@@ -103,7 +108,8 @@ plot_application_correlations <- function() {
             plot(data[, first], data[, second], xlab = first, ylab = second)
         }
 
-        print(paste(paste("Plot generated at ", plot_dir, collapse = "",
+        print(paste(paste("Plot generated at ",
+                          paste(plot_dir, collapse = ""),
                           sep = ""), paste("correlations_", application,
                                            ".eps", sep = ""),
                     sep = "/"))
