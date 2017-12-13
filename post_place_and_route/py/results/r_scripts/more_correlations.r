@@ -44,8 +44,7 @@ sorted_correlations <- function(data, datapoints) {
          n = datapoints)
 }
 
-plot_correlations <- function(application, experiments, cor_method,
-                              plot_columns) {
+load_data <- function(application, experiments) {
     data       <- data.frame()
 
     for (experiment in experiments) {
@@ -67,6 +66,12 @@ plot_correlations <- function(application, experiments, cor_method,
     }
 
     data  <- as.data.frame(sapply(data, as.numeric))
+    return(data)
+}
+
+plot_correlations <- function(application, experiments, cor_method,
+                              plot_columns) {
+    data <- load_data(application, experiments)
 
     cormatrix <- cor(data, method = cor_method)
     diag(cormatrix) <- 0
@@ -120,23 +125,72 @@ plot_correlations <- function(application, experiments, cor_method,
     return(short_correlation)
 }
 
-cor_pearson <- plot_correlations("dfdiv", experiments, "pearson", 10)
-cor_spearman <- plot_correlations("dfdiv", experiments, "spearman", 10)
-cor_kendall <- plot_correlations("dfdiv", experiments, "kendall", 10)
+plot_correlation_columns <- function (data, correlations, cor_method,
+                                      application) {
+    postscript(paste(paste(plot_dir, collapse = ""), paste(cor_method,
+                                                           "_largest_",
+                                                           application,
+                                                           ".eps",
+                                                           sep = ""),
+                     sep = "/"),
+               width = 20, height = 20)
+
+    columns <- unique(c(as.vector(correlations$First.Variable),
+                        as.vector(correlations$Second.Variable)))
+
+    ggpairs_plot <- ggpairs(data, columns = columns)
+
+    print(ggpairs_plot)
+
+    print(paste(paste("Plot generated at ",
+                      paste(plot_dir, collapse = ""),
+                      sep = ""), paste(cor_method, "_largest_",
+                                       application, ".eps",
+                                       sep = ""),
+                sep = "/"))
+
+    dev.off()
+}
+
+application <- "dfdiv"
+
+cor_pearson <- plot_correlations(application, experiments, "pearson", 10)
+cor_spearman <- plot_correlations(application, experiments, "spearman", 10)
+cor_kendall <- plot_correlations(application, experiments, "kendall", 10)
 
 print(cor_pearson)
 print(cor_spearman)
 print(cor_kendall)
 
-inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
-           cor_spearman[ c("First.Variable", "Second.Variable")])
+correlations <- inner_join(cor_pearson[c("First.Variable",
+                                         "Second.Variable")],
+                           cor_spearman[c("First.Variable",
+                                          "Second.Variable")])
 
-inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
-           cor_kendall[ c("First.Variable", "Second.Variable")])
+plot_correlation_columns(load_data(application, experiments), correlations,
+                         "pearson_spearman", application)
 
-inner_join(cor_spearman[ c("First.Variable", "Second.Variable")],
-           cor_kendall[ c("First.Variable", "Second.Variable")])
+correlations <- inner_join(cor_pearson[c("First.Variable",
+                                         "Second.Variable")],
+                           cor_kendall[c("First.Variable",
+                                         "Second.Variable")])
 
-inner_join(inner_join(cor_pearson[ c("First.Variable", "Second.Variable")],
-           cor_spearman[ c("First.Variable", "Second.Variable")]),
-           cor_kendall[ c("First.Variable", "Second.Variable")])
+plot_correlation_columns(load_data(application, experiments), correlations,
+                         "pearson_kendall", application)
+
+correltions <- inner_join(cor_spearman[c("First.Variable",
+                                         "Second.Variable")],
+                          cor_kendall[c("First.Variable",
+                                        "Second.Variable")])
+plot_correlation_columns(load_data(application, experiments), correlations,
+                         "spearman_kendall", application)
+
+correlations <- inner_join(inner_join(cor_pearson[c("First.Variable",
+                                                    "Second.Variable")],
+                                      cor_spearman[c("First.Variable",
+                                                     "Second.Variable")]),
+                           cor_kendall[c("First.Variable",
+                                         "Second.Variable")])
+
+plot_correlation_columns(load_data(application, experiments), correlations,
+                         "pearson_spearman_kendall", application)
