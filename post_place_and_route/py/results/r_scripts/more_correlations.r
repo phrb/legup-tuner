@@ -23,7 +23,7 @@ applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
 hardware_metrics <- c("WNS", "Cycles", "FMax", "LUs", "Pins", "Regs",
                       "Blocks", "RAM", "DPS")
 
-dir.create(paste(plot_dir, collapse = ""))
+dir.create(paste(plot_dir, collapse = ""), showWarnings = FALSE)
 
 #
 # Function adapted from:
