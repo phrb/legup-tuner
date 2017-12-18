@@ -24,7 +24,7 @@ hardware_metrics <- c("WNS", "Cycles", "FMax", "LUs", "Pins", "Regs",
                       "Blocks", "RAM", "DPS")
 
 load_data <- function(application, experiments) {
-    data       <- data.frame()
+    data <- data.frame()
 
     for (experiment in experiments) {
         new_data <- read.csv(paste(paste(csv_dir, collapse = ""),
