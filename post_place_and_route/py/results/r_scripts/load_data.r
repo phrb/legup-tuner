@@ -23,7 +23,7 @@ applications <- c("dfadd", "dfdiv", "dfmul", "sha", "motion", "adpcm",
 hardware_metrics <- c("WNS", "Cycles", "FMax", "LUs", "Pins", "Regs",
                       "Blocks", "RAM", "DPS")
 
-load_data <- function(application, experiments) {
+load_data <- function(application, experiments, removed_columns) {
     data <- data.frame()
 
     for (experiment in experiments) {
@@ -47,7 +47,6 @@ load_data <- function(application, experiments) {
     data <- data %>% drop_na()
     data <- data[is.finite(data$WNS),]
     data <- data %>% mutate(MKS = (Cycles / (1000 * FMax)))
-    data <- select(data, -one_of(c("WNS", "Blocks", "RAM", "LUs", "Pins",
-                                   "Cycles", "FMax")))
+    data <- select(data, -one_of(removed_columns))
     return(data)
 }
