@@ -28,7 +28,8 @@ plot_uniques <- function(range, data) {
                                           by = 2)) +
           scale_y_continuous(breaks = seq(min(uniques$Parameters),
                                           max(uniques$Parameters),
-                                          by = 10))
+                                          by = 10),
+                             trans = "log")
 }
 
 get_parameters_with_values <- function(threshold, data) {

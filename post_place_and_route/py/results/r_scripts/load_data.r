@@ -36,6 +36,8 @@ load_data <- function(application, experiments, removed_columns) {
 
         new_data <- as.data.frame(new_data)
 
+        new_data["experiment"] <- rep(experiment, nrow(new_data))
+
         if (ncol(data) == 0) {
             data <- new_data
         } else {
