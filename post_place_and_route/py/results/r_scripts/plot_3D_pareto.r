@@ -1,3 +1,4 @@
+library(rPref)
 plot_3D_pareto <- function(data) {
     criterion <- low(MKS) * low(Regs) * low(DPS)
 
